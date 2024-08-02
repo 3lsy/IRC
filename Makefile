@@ -6,7 +6,7 @@
 #    By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/27 11:58:01 by echavez-          #+#    #+#              #
-#    Updated: 2024/07/27 12:43:57 by echavez-         ###   ########.fr        #
+#    Updated: 2024/08/01 17:36:13 by echavez-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,18 +21,19 @@ INCLUDE     =   -O3 -I $(INC)            			 # Header files
 #****************** SRC *******************#
 
 DIRSRC      =   ./src/
-DIRSOC      :=  $(DIRSRC)/socket/
+DIRSRV  	:=  $(DIRSRC)/server/
 DIRUSR      :=  $(DIRSRC)/users/
 DIRCOM	   	:=  $(DIRSRC)/communication/
 
-DIRS        :=  $(DIRSRC) $(DIRSOC) $(DIRUSR) $(DIRCOM)
+DIRS        :=  $(DIRSRC) $(DIRSRV) $(DIRUSR) $(DIRCOM)
 
-SRC         =   main.c #debug.c remove debug.c when done
-#SOC         =   socket.c
-#USR         =   user.c
-#COM         =   communication.c
+SRC         =   main.cpp #debug.c remove debug.c when done
+SRV			=	IRC.cpp IRC_socket.cpp IRC_serve.cpp
+#SOC         =   socket.cpp
+#USR         =   user.cpp
+#COM         =   communication.cpp
 
-SRCS        :=  $(SRC) #$(SOC) $(USR) $(COM)
+SRCS        :=  $(SRC) $(SRV) #$(SOC) $(USR) $(COM)
 
 #***************** DEPS ******************#
 
@@ -41,8 +42,8 @@ DIROBJ      =   ./depo/
 #********************************* END OF CONFIG *********************************#
 
 OAUX        =   $(SRCS:%=$(DIROBJ)%)
-DEPS        =   $(OAUX:.c=.d)
-OBJS        =   $(OAUX:.c=.o)
+DEPS        =   $(OAUX:.cpp=.d)
+OBJS        =   $(OAUX:.cpp=.o)
 
 .ONESHELL:
 

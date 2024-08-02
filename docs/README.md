@@ -14,6 +14,24 @@
 | **Community Support**     | Strong                    | Strong                     | Strong                   |
 | **Modern Features**       | Yes (GUI-based)           | No                         | Yes (CLI-based)          |
 
+## Usage
+
+### Network
+
+#### Ports
+
+[Service Name and Transport Protocol Port Number Registry](https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml)
+
+> [!NOTE]
+> **Internet Assigned Numbers Authority (IANA)**:
+> Port numbers are assigned in various ways, based on three ranges: System Ports (0-1023), User Ports (1024-49151), and the Dynamic and/or Private Ports (49152-65535);
+
+| Category | Port Range |
+|:--------:|:-----:|
+| Well-Known / System | 0 - 1023   |
+| Registered / User | 1024 - 49151 | 
+| Dynamic / Private | 49152-65535  |
+
 ## Development
 
 ### Libraries

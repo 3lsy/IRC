@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   irc.hpp                                            :+:      :+:    :+:   */
+/*   lib.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/27 11:58:25 by echavez-          #+#    #+#             */
-/*   Updated: 2024/07/27 12:44:53 by echavez-         ###   ########.fr       */
+/*   Created: 2024/07/27 13:14:18 by echavez-          #+#    #+#             */
+/*   Updated: 2024/08/02 17:14:57 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef IRC_HPP
-# define IRC_HPP
+#ifndef LIB_HPP
+# define LIB_HPP
 
 #include <iostream>         // For standard I/O functions
 #include <sys/types.h>      // For data types used in system calls
@@ -26,5 +26,9 @@
 #include <cstring>          // For memset, memcpy
 #include <cstdio>           // For standard I/O functions
 #include <cstdlib>          // For general utilities like exit()
+#include <vector>           // For std::vector
+
+//test
+#include <cerrno>           // For errno
 
 #endif
