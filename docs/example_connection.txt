@@ -1,6 +1,6 @@
 WEECHAT:
 
-/server add my_irc localhost/6667 -password=MICONTRASENA
+/server add my_irc localhost/6668 -password=MICONTRASENA
 /connect my_irc
 
          │08:49:37 weechat     | irc: server added: my_irc

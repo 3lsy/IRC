@@ -1,0 +1,7 @@
+Necesitan saber en que version del idioma se van a comunicar el cliente y el servidor y si son compatibles
+
+Mi irc server solo va a hablar solo un idioma, irc3.2.
+
+CAP LS 302: Capabilities List version 3.2
+
+El cliente necesita enviar el usuario y password

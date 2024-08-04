@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 10:28:08 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/03 13:36:59 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/04 22:11:27 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,14 @@ void	IRC::_read_from_client(int fd)
 		this->_buffer[this->_bytes_read] = '\0';
 		std::cout << "Received: " << this->_buffer << std::endl;
 		send(fd, this->_buffer, this->_bytes_read, 0);
+		send(fd, ":server.hostname 001 echavez- :Welcome to the IRC Network echavez-!echavez-@echavez-", 84, 0);
+		// for (int i_fd = 0; i_fd <= this->_max_fd; ++i_fd)
+		// {
+		// 	if (FD_ISSET(i_fd, &this->_write_set))
+		// 	{
+		// 		send(i_fd, ":server.hostname 001 echavez- :Welcome to the IRC Network echavez-!echavez-@echavez-", 84, 0);
+		// 	}
+		// }
 	}
 }
 
