@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 11:57:58 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/01 17:56:14 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/03 13:08:16 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,9 @@ int main(int ac, char **av)
 		port = atoi(av[1]);
 		if (!IRC::valid_port(port))
 			return (1);
-		IRC irc(port, av[2]);
-		irc.serve();
+		std::signal(SIGINT, IRC::signal_handler);
+        IRC* irc = IRC::getInstance(port, av[2]);
+		irc->serve();
 		return (0);
 	}
 	std::cout << "Usage: ./ircserv <port> <password>" << std::endl;

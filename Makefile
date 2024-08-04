@@ -6,7 +6,7 @@
 #    By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/27 11:58:01 by echavez-          #+#    #+#              #
-#    Updated: 2024/08/01 17:36:13 by echavez-         ###   ########.fr        #
+#    Updated: 2024/08/03 11:44:47 by echavez-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,12 +28,12 @@ DIRCOM	   	:=  $(DIRSRC)/communication/
 DIRS        :=  $(DIRSRC) $(DIRSRV) $(DIRUSR) $(DIRCOM)
 
 SRC         =   main.cpp #debug.c remove debug.c when done
-SRV			=	IRC.cpp IRC_socket.cpp IRC_serve.cpp
+SRV			=	IRC.cpp IRC_socket.cpp IRC_serve.cpp IRC_connection.cpp
 #SOC         =   socket.cpp
-#USR         =   user.cpp
+USR         =   Client.cpp
 #COM         =   communication.cpp
 
-SRCS        :=  $(SRC) $(SRV) #$(SOC) $(USR) $(COM)
+SRCS        :=  $(SRC) $(SRV) $(USR) #$(SOC) $(COM)
 
 #***************** DEPS ******************#
 
