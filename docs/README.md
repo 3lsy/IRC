@@ -118,3 +118,30 @@
 - **`CAP END` and `CAP ABORT`:** No response required.
 - **`CAP CLEAR`:** Acknowledge the request to disable all capabilities.
 - **`CAP NEW :<capability>` and `CAP DEL :<capability>`:** Inform the client of new or removed capabilities after registration.
+
+### IRCv3 Communication Commands
+
+
+| Command | Parameters                          | Description                                                      | Example                                                       | Expected Response                                                                 |
+|---------|-------------------------------------|------------------------------------------------------------------|---------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| PASS    | `<password>`                        | Sets a connection password                                       | `PASS secretpassword`                                         | No response if successful. `ERROR` message if failed.                             |
+| CAP     | `<subcommand> [:<capabilities>]`    | Requests or lists supported capabilities                         | `CAP REQ :multi-prefix`                                       | `CAP` acknowledgment or error message.                                            |
+| NICK    | `<nickname>`                        | Sets or changes the user's nickname                              | `NICK newnickname`                                            | `NICK` change confirmation or error if nickname is invalid or in use.             |
+| USER    | `<username> 0 * <realname>`         | Registers a new user with the server                             | `USER myusername 0 * My Real Name`                            | Welcome messages from the server, including `001` (RPL_WELCOME).                  |
+| QUIT    | `[<reason>]`                        | Disconnects from the server, optionally providing a reason       | `QUIT :Goodbye everyone`                                      | No response from the server as the user is disconnected.                          |
+| JOIN    | `<channel>{,<channel>} [<key>{,<key>}]` <br> Alt Params: `0` | Joins one or more channels, optionally with keys <br> Leaves all channels | `JOIN #channel1,#channel2 key1,key2` <br> `JOIN 0` | `JOIN` confirmation and `MODE`, `TOPIC`, and `NAMES` responses for each channel. |
+| TOPIC   | `<channel> [<topic>]`               | Sets or views the topic of a channel                             | `TOPIC #channel :New Topic`                                   | `TOPIC` confirmation or the current topic if no new topic is provided.            |
+| KICK    | `<channel> <user> *( "," <user> ) [<comment>]` | Removes one or more users from a channel, optionally with a comment | `KICK #channel user1,user2 :Breaking rules`                   | `KICK` message for each user kicked.                                              |
+| INVITE  | `<nickname> <channel>`              | Invites a user to a channel                                      | `INVITE friend #channel`                                      | `INVITE` confirmation and notification to the invited user.                       |
+| MODE    | `<target> [<modestring> [<mode arguments>...]]` | Changes modes for a user or channel                              | `MODE #channel +o username`                                    | `MODE` confirmation message.                                                      |
+
+#### MODE Command Options
+
+| Option | Description                                   | Example                                | Expected Response                  |
+|--------|-----------------------------------------------|----------------------------------------|------------------------------------|
+| +i     | Sets the channel to invite-only mode          | `MODE #channel +i`                     | `MODE #channel +i` confirmation    |
+| +t     | Only channel operators can set the topic      | `MODE #channel +t`                     | `MODE #channel +t` confirmation    |
+| +k     | Sets a key (password) for the channel         | `MODE #channel +k secretkey`           | `MODE #channel +k` confirmation    |
+| +o     | Gives operator status to a user               | `MODE #channel +o username`            | `MODE #channel +o` confirmation    |
+| +l     | Sets a user limit on the channel              | `MODE #channel +l 50`                  | `MODE #channel +l` confirmation    |
+
