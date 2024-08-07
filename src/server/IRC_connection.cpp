@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 10:28:08 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/04 22:11:27 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/07 15:14:26 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ void	IRC::_new_connection(void)
 	}
 	this->_clients.push_back(client);
 	this->_n_clients++;
+	 std::cout << "New client connected with fd: " << client->fd << std::endl << std::endl;
 }
 
 void	IRC::_read_from_client(int fd)
@@ -61,6 +62,7 @@ void	IRC::_read_from_client(int fd)
 
 void	IRC::_remove_client(int fd)
 {
+	std::cout << "Removing client with fd: " << fd << std::endl << std::endl;
 	std::vector<Client *>::iterator it = this->_clients.begin();
 	while (it != this->_clients.end())
 	{

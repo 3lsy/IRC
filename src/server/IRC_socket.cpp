@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 13:24:44 by echavez-          #+#    #+#             */
-/*   Updated: 2024/07/29 15:12:13 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/07 14:51:02 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,13 @@ void	IRC::_create_socket(void)
  */
 void	IRC::_bind_socket(void)
 {
+    int optval = 1;
+	if (setsockopt(this->_socket_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0 ||
+        setsockopt(this->_socket_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval)) < 0) {
+        std::cerr << "Error: Unable to set socket options" << std::endl;
+        close(this->_socket_fd);
+        exit(1);
+    }
 	std::memset(&this->_serv_addr, 0, sizeof(this->_serv_addr));
 	this->_serv_addr.sin_family = AF_INET;
 	this->_serv_addr.sin_addr.s_addr = INADDR_ANY;
