@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 14:58:50 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 17:06:26 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 18:19:17 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	IRC::_init_fd_sets(void)
 	memcpy(&this->_read_set, &this->_master_set, sizeof(this->_master_set));
 	memcpy(&this->_write_set, &this->_master_set, sizeof(this->_master_set));
 	n_fds = select(this->_max_fd + 1, &this->_read_set, &this->_write_set, NULL, NULL);
-	if (n_fds < 0 && errno != EINTR)
+	if (this->_running && n_fds < 0 && errno != EINTR)
 	{
 		std::cerr << RED << "SERVER: Error: select error: " << strerror(errno) << RESET << std::endl;
 		exit(1);
@@ -72,6 +72,10 @@ void IRC::serve(void) {
 			break;
 		this->_event_search();
 	}
+    if (instance) {
+		delete instance;
+        instance = NULL;
+    }
 }
 
 /**

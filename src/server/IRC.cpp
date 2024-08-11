@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 13:22:11 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 17:46:18 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 18:19:43 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,7 @@ bool	IRC::valid_port(int port) {
 
 void	IRC::signal_handler(int signum __attribute__((unused))) {
 	std::cout << BLUE << "SERVER: Stopping server" << RESET << std::endl;
-	if (instance) {
-        instance->stop_server();
-		delete instance;
-    }
+    instance->stop_server();
 }
 
 IRC::IRC(int port, std::string password):

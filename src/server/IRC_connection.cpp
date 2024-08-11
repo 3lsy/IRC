@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 10:28:08 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 18:02:25 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 18:09:16 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ void IRC::_new_connection(void)
 
     if (client->fd < 0) {
         delete client;
+        client = NULL;
         return ;
     }
     FD_SET(client->fd, &this->_master_set);
