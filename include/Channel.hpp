@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 17:33:12 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 18:59:25 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 19:05:10 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ class Channel {
 		~Channel();
 		void					join(int client_fd);
 		void					send_message(int client_fd, std::string message);
+		void					change_topic(std::string topic);
 };
 
 #endif
