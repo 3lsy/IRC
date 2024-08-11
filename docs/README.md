@@ -158,6 +158,12 @@ We chose [WeeChat](https://weechat.org/) as client, even though we followed the 
 | INVITE  | `<nickname> <channel>`              | Invites a user to a channel                                      | `INVITE friend #channel`                                      | `INVITE` confirmation and notification to the invited user.                       |
 | MODE    | `<target> [<modestring> [<mode arguments>...]]` | Changes modes for a user or channel                              | `MODE #channel +o username`                                    | `MODE` confirmation message.                                                      |
 
+- JOIN: Can be used from anywhere in the IRC client to join channels.
+- TOPIC: Must be used from within the channel; usually only operators can change it.
+- KICK: Must be executed from within the channel; only operators can kick users.
+- INVITE: Can be executed from anywhere, specifying the user and channel.
+- MODE: Must be used from within the channel; typically requires operator privileges.
+
 #### MODE Command Options
 
 | Option | Description                                   | Example                                | Expected Response                  |

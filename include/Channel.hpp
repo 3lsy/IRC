@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 17:33:12 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 16:51:34 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 18:59:25 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,26 +15,36 @@
 
 # include "lib.h"
 
-
 class Client;
+
+/** @brief Class to handle the channel object
+ *
+ * @note When the user limit is set, the channel will not accept more users than the limit
+ *       It can be set to less than the people already in the channel, but no new users will be able to join
+ */
 
 class Channel {
 	private:
+		bool					invite_only; // i
+		bool					topic_locked; // t
+		bool					key_password; // k
+		int						user_limit; // l
 		// Attributes
-		std::string		        _name;
-		std::string	        	_password;
+		std::string				_name;
+		std::string				_password;
 		std::map<int, Client *>	_members;
-		std::map<int, Client *>	_operators;
+		std::map<int, Client *>	_operators; // o
 		// Methods
 		void	_broadcast(std::string message);
 	public:
+		// Attributes
+		std::string				topic;
 		// Methods
 		Channel();
 		Channel(std::string name, std::string password);
 		~Channel();
-		void	join(int client_fd);
-		void	leave(int client_fd);
-		void	send_message(int client_fd, std::string message);
+		void					join(int client_fd);
+		void					send_message(int client_fd, std::string message);
 };
 
 #endif
