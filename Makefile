@@ -6,7 +6,7 @@
 #    By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/27 11:58:01 by echavez-          #+#    #+#              #
-#    Updated: 2024/08/11 18:27:14 by echavez-         ###   ########.fr        #
+#    Updated: 2024/08/11 20:21:27 by echavez-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,7 +31,7 @@ SRC         =   main.cpp #debug.c remove debug.c when done
 SRV			=	IRC.cpp IRC_socket.cpp IRC_serve.cpp IRC_connection.cpp
 #SOC         =   socket.cpp
 USR         =   Client.cpp
-COM         =   Client_login.cpp
+COM         =   Client_login.cpp Channel.cpp IRC_interactions.cpp
 
 SRCS        :=  $(SRC) $(SRV) $(USR) $(COM) #$(SOC)
 

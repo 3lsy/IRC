@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 13:16:01 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 17:00:00 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 20:15:43 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,11 @@ private:
 	void				_event_search(void);
 	void				_read_from_client(int fd);
 
+    //command handler for communication (PRIVMSG, JOIN, PART, etc)
+    void                _interaction(std::string command, int fd);
+    void                _cmd_join(std::string channels, std::string passwords, int client_fd);
+
+
 	// Static pointer to hold the singleton instance
 	static IRC* instance;
 	// Private constructor to prevent instantiation
@@ -69,5 +74,8 @@ public:
 	int					getPort(void) const;
 	std::string			getPassword(void) const;
 };
+
+std::vector<std::string>    split_cmd(const std::string& str);
+std::vector<std::string>    split_by(const std::string& str, char delim);
 
 #endif

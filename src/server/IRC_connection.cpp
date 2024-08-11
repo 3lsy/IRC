@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 10:28:08 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 18:32:29 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 20:20:43 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,8 @@ void	IRC::_read_from_client(int fd)
             else if (this->_clients[fd]->logged_in)
                 this->_nicknames[this->_clients[fd]->nickname] = fd;
         }
+        else
+            this->_interaction(this->_buffer, fd);
 	}
 }
 

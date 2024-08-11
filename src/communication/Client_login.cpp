@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/11 18:27:01 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 18:27:03 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 20:15:34 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,26 @@
 /**
  * @brief Splits a string into a vector of strings separated by spaces
  */
-std::vector<std::string> split_cmd(const std::string& str)
+std::vector<std::string>    split_cmd(const std::string& str)
 {
     std::vector<std::string> result;
     std::istringstream stream(str);
     std::string word;
 
     while (stream >> word) {
+        result.push_back(word);
+    }
+
+    return result;
+}
+
+std::vector<std::string>    split_by(const std::string& str, char delim)
+{
+    std::vector<std::string> result;
+    std::istringstream stream(str);
+    std::string word;
+
+    while (std::getline(stream, word, delim)) {
         result.push_back(word);
     }
 
@@ -64,10 +77,15 @@ bool Client::login(std::string command)
 			return (false);
 		this->_cmd_user(cmd[1], cmd[2], cmd[3], cmd[4]);
 	}
+    else if (cmd[0] == "QUIT")
+    {
+        this->_cmd_quit();
+    }
 
     if (this->_password && this->nickname != "" && this->_username != "" && this->_realname != "")
     {
         std::string welcomeMessage = ":server.hostname 001 " + this->nickname + " :Welcome to the Internet Relay Network " + this->nickname + "!" + this->_username + "@" + this->_hostname + "\r\n";
+        std::cout << BLUE << "SERVER: Sending welcome message to client: " << this->nickname << RESET << std::endl;
         if (send(this->fd, welcomeMessage.c_str(), welcomeMessage.length(), 0) < 0) {
             std::cerr << RED << "SERVER: Error sending welcome message to client" << RESET << std::endl;
         }
@@ -83,7 +101,6 @@ bool Client::login(std::string command)
  */
 bool	Client::_cmd_pass(std::string password)
 {
-	this->_password = false;
 	if (password == IRC::getInstance()->getPassword())
 	{
 		std::cout << BLUE << "SERVER: Password accepted" << RESET << std::endl;
@@ -97,6 +114,7 @@ bool	Client::_cmd_pass(std::string password)
         if (send(this->fd, errorMessage.c_str(), errorMessage.length(), 0) < 0) {
             std::cerr << RED << "SERVER: Error sending password error message to client" << RESET << std::endl;
         }
+	    this->_password = false;
 		return (false);
 	}
 }
