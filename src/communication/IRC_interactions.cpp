@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IRC_interactions.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ciglesia <ciglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/11 19:47:39 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 20:19:28 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 22:30:54 by ciglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,8 @@ void    IRC::_interaction(std::string command, int client_fd)
  * @param channels The name of the channels to join
  * @param passwords The passwords for the channels
  * @param client_fd The file descriptor of the client
+ * 
+ * @todo Delete the channel in the destructor
  */
 void    IRC::_cmd_join(std::string channels, std::string passwords, int client_fd)
 {
@@ -58,9 +60,21 @@ void    IRC::_cmd_join(std::string channels, std::string passwords, int client_f
         if (this->_channels.find(chans[i]) == this->_channels.end())
         {
             // Channel does not exist, create it
-            Channel *new_channel = new Channel(chans[i], pass[i]);
-            this->_channels[chans[i]] = new_channel;
+            if (pass.size() <= i)
+            {
+                Channel *new_channel = new Channel(chans[i]);
+                this->_channels[chans[i]] = new_channel;
+            }
+            else
+            {
+                Channel *new_channel = new Channel(chans[i], pass[i]);
+                this->_channels[chans[i]] = new_channel;
+            }
         }
-        this->_channels[chans[i]]->join(client_fd, pass[i]);
+        std::cout << BLUE << "SERVER: JOIN " << chans[i] << RESET << std::endl;
+        if (pass.size() <= i)
+            this->_channels[chans[i]]->join(this->_clients[client_fd]);
+        else
+            this->_channels[chans[i]]->join(this->_clients[client_fd], pass[i]);
     }
 }
