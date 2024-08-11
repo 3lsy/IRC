@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 19:12:26 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 14:52:52 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 15:06:12 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,18 +53,17 @@ void	Client::command_handler(std::string command)
 	{
 		if (cmd.size() < 2)
 			return ;
-		//this->_cmd_nick(cmd[1]);
+		this->_cmd_nick(cmd[1]);
 	}
 	else if (cmd[0] == "USER")
 	{
 		if (cmd.size() < 5)
 			return ;
-		//this->_cmd_user(cmd[1], cmd[2], cmd[3], cmd[4]);
+		this->_cmd_user(cmd[1], cmd[2], cmd[3], cmd[4]);
 	}
-
 	else if (cmd[0] == "QUIT")
 	{
-		// this->_cmd_quit();
+		this->_cmd_quit();
 	}
 	//check if PASS, NICK, USER were correct, to send a welcome message
 }
