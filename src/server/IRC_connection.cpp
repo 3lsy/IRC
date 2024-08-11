@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 10:28:08 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/09 12:02:38 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 14:28:05 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	IRC::_read_from_client(int fd)
 			std::cerr << "Error: Unable to read from client" << std::endl;
 		close(fd);
 		FD_CLR(fd, &this->_master_set);
-		this->_remove_client(fd);
+		this->remove_client(fd);
 	}
 	else
 	{
@@ -63,7 +63,7 @@ void	IRC::_read_from_client(int fd)
  * 
  * @param fd The file descriptor of the client to remove
  */
-void IRC::_remove_client(int fd)
+void IRC::remove_client(int fd)
 {
     // Find the client in the map
     std::map<int, Client *>::iterator it = this->_clients.find(fd);

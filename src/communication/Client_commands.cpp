@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 19:12:26 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 14:24:52 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 14:32:04 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,4 +90,40 @@ void	Client::_cmd_pass(std::string password)
             std::cerr << "Error sending password error message to client" << std::endl;
         }
 	}
+}
+
+/**
+ * @brief Handles the NICK command
+ * 
+ * @param nickname The nickname received from the client
+ */
+void	Client::_cmd_nick(std::string nickname)
+{
+    this->_nickname = nickname;
+}
+
+/**
+ * @brief Handles the USER command
+ * 
+ * @param username The username received from the client
+ * @param hostname The hostname received from the client
+ * @param servername The servername received from the client
+ * @param realname The realname received from the client
+ */
+void	Client::_cmd_user(std::string username, std::string hostname, 
+                        std::string servername, std::string realname)
+{
+    this->_username = username;
+    this->_hostname = hostname;
+    this->_servername = servername;
+    this->_realname = realname;
+}
+
+/**
+ * @brief Handles the QUIT command
+ */
+void	Client::_cmd_quit(void)
+{
+    close(this->fd);
+    IRC::getInstance()->remove_client(this->fd);
 }
