@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 10:38:37 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/09 12:01:59 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 15:07:01 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ class Client {
 		void	_cmd_quit(void);
 	public:
 		// Attributes
+        bool                logged_in;
 		int					fd;
 		struct sockaddr_in	socket_addr;
 		socklen_t			socket_len;

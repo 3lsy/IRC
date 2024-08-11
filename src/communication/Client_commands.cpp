@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 19:12:26 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 15:04:25 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 15:07:07 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ void	Client::command_handler(std::string command)
         if (send(this->fd, welcomeMessage.c_str(), welcomeMessage.length(), 0) < 0) {
             std::cerr << "Error sending welcome message to client" << std::endl;
         }
+        this->logged_in = true;
     }
 }
 
