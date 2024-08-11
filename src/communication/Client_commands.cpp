@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 19:12:26 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 15:07:07 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 15:10:46 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,6 @@ void	Client::command_handler(std::string command)
 			return ;
 		this->_cmd_user(cmd[1], cmd[2], cmd[3], cmd[4]);
 	}
-
 	else if (cmd[0] == "QUIT")
 	{
 		this->_cmd_quit();
