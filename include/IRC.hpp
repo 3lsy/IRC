@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 13:16:01 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 20:15:43 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 21:31:30 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ private:
     //command handler for communication (PRIVMSG, JOIN, PART, etc)
     void                _interaction(std::string command, int fd);
     void                _cmd_join(std::string channels, std::string passwords, int client_fd);
+	void				_cmd_privmsg(std::string target, std::string message, int client_fd);
 
 
 	// Static pointer to hold the singleton instance
