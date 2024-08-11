@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 10:28:08 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 20:20:43 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 22:48:02 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,33 @@ void IRC::_new_connection(void)
     std::cout << BLUE << "SERVER: New client connected with fd: " << client->fd << RESET << std::endl;
 }
 
+void    IRC::_read_client_message(int fd)
+{
+    if (!this->_clients[fd]->logged_in)
+    {
+        if (this->_clients[fd]->login(this->_buffer) == false)
+        {
+            this->remove_client(fd);
+            return ;   
+        }
+        // if nickname is already in use, remove client
+        if (this->_nicknames.find(this->_clients[fd]->nickname) != this->_nicknames.end())
+        {
+            std::cerr << RED << "SERVER: Error: Nickname already in use" << RESET << std::endl;
+            std::string errorMessage = ":server.hostname 433 * " + this->_clients[fd]->nickname + " :Nickname is already in use\r\n";
+            if (send(fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
+            {
+                std::cerr << RED << "SERVER: Error sending nickname error message to client" << RESET << std::endl;
+            }
+            this->remove_client(fd);
+            return ;
+        }
+        else if (this->_clients[fd]->logged_in)
+            this->_nicknames[this->_clients[fd]->nickname] = fd;
+    }
+    else
+        this->_interaction(this->_buffer, fd);  
+}
 
 /**
  * @brief This function reads from the client and sends a response back
@@ -53,30 +80,12 @@ void	IRC::_read_from_client(int fd)
 	{
 		this->_buffer[this->_bytes_read] = '\0';
 		std::cout << GREEN << "CLIENT: " << this->_buffer << RESET << std::endl;
-        if (!this->_clients[fd]->logged_in)
+        std::vector<std::string> lines = split_by(this->_buffer, '\n');
+        for (size_t i = 0; i < lines.size(); i++)
         {
-            if (this->_clients[fd]->login(this->_buffer) == false)
-            {
-                this->remove_client(fd);
-                return ;   
-            }
-            // if nickname is already in use, remove client
-            if (this->_nicknames.find(this->_clients[fd]->nickname) != this->_nicknames.end())
-            {
-                std::cerr << RED << "SERVER: Error: Nickname already in use" << RESET << std::endl;
-                std::string errorMessage = ":server.hostname 433 * " + this->_clients[fd]->nickname + " :Nickname is already in use\r\n";
-                if (send(fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
-                {
-                    std::cerr << RED << "SERVER: Error sending nickname error message to client" << RESET << std::endl;
-                }
-                this->remove_client(fd);
-                return ;
-            }
-            else if (this->_clients[fd]->logged_in)
-                this->_nicknames[this->_clients[fd]->nickname] = fd;
+            strcpy(this->_buffer, lines[i].c_str());
+            this->_read_client_message(fd);
         }
-        else
-            this->_interaction(this->_buffer, fd);
 	}
 }
 

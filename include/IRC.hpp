@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 13:16:01 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 21:31:30 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 22:46:39 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ private:
 	int					_n_clients;
 	std::map<int, Client *>             _clients;
 	std::map<std::string, Channel *>    _channels;
-    std::map<std::string, int>          _nicknames;
+	std::map<std::string, int>          _nicknames;
 	// fd_set for select
 	fd_set				_read_set;
 	fd_set				_write_set;
@@ -46,15 +46,15 @@ private:
 	void				_new_connection(void);
 	void				_event_search(void);
 	void				_read_from_client(int fd);
+	void				_read_client_message(int fd);
 
     //command handler for communication (PRIVMSG, JOIN, PART, etc)
     void                _interaction(std::string command, int fd);
     void                _cmd_join(std::string channels, std::string passwords, int client_fd);
 	void				_cmd_privmsg(std::string target, std::string message, int client_fd);
 
-
 	// Static pointer to hold the singleton instance
-	static IRC* instance;
+	static IRC*			instance;
 	// Private constructor to prevent instantiation
 	IRC(int port, std::string password);
 	~IRC(void);
@@ -76,7 +76,7 @@ public:
 	std::string			getPassword(void) const;
 };
 
-std::vector<std::string>    split_cmd(const std::string& str);
-std::vector<std::string>    split_by(const std::string& str, char delim);
+std::vector<std::string>	split_cmd(const std::string& str);
+std::vector<std::string>	split_by(const std::string& str, char delim);
 
 #endif
