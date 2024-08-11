@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 10:38:37 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 15:07:01 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 16:42:33 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 
 # include "lib.h"
 
+class Channel;
+
 class Client {
 	private:
 		// Attributes
@@ -22,6 +24,8 @@ class Client {
 		socklen_t			_socket_len;
 		// privileged channels
 		// member channels
+		//map of the channels the client is in
+		std::map<std::string, Channel*>	_channels;
 		bool				_password;
 		std::string			_nickname;
 		std::string			_username;
@@ -36,6 +40,8 @@ class Client {
 		void	_cmd_user(std::string username, std::string hostname, 
 						std::string servername, std::string realname);
 		void	_cmd_quit(void);
+		// Communication methods
+		void	_cmd_privmsg(std::string target, std::string message);
 	public:
 		// Attributes
         bool                logged_in;
@@ -46,7 +52,10 @@ class Client {
 		Client(void);
 		Client(int fd);
 		~Client(void);
+		//command handler for PASS, NICK, USER, QUIT
 		void	command_handler(std::string command);
+		//command handler for communication (PRIVMSG, JOIN, PART, etc)
+		void	communication_handler(std::string command);
 };
 
 #endif

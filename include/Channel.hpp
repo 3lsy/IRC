@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 17:33:12 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/07 19:09:55 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 16:42:38 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,16 @@
 
 # include "lib.h"
 
+
+class Client;
+
 class Channel {
 	private:
 		// Attributes
 		std::string		_name;
 		std::string		_password;
-		/*
-		** Maybe a Client class will be created in the future
-		** to handle the client's information and position in the channel, to differentiate between members and operators
-		*/
-		std::vector<int>	_members;
+		std::map<int, Client *>	_members;
+		std::map<int, Client *>	_operators;
 		// Methods
 		void	_broadcast(std::string message);
 	public:

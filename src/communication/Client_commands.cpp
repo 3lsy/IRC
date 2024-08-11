@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 19:12:26 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 15:10:46 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 16:01:53 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,8 +80,6 @@ void	Client::command_handler(std::string command)
  * @brief Handles the PASS command
  * 
  * @param password The password received from the client
- * 
- * @todo: send messape with nickname
  */
 void	Client::_cmd_pass(std::string password)
 {
