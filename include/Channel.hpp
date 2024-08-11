@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 17:33:12 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 20:19:46 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 21:24:07 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,9 @@ class Channel {
 		// Attributes
 		std::string				_name;
 		std::string				_password;
-		std::map<int, Client *>	_members;
-		std::map<int, Client *>	_operators; // o
+		std::map<std::string, Client *>	_members;
+		std::map<std::string, Client *>	_operators; // o
+		std::map<std::string, Client *> _invited;
 		// Methods
 		void	_broadcast(std::string message);
 	public:
@@ -43,7 +44,7 @@ class Channel {
 		Channel();
 		Channel(std::string name, std::string password);
 		~Channel();
-		void					join(int client_fd, std::string password);
+		bool					join(int client_fd, std::string password);
 		void					send_message(int client_fd, std::string message);
 		void					change_topic(std::string topic);
 };
