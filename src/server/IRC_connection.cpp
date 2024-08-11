@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 10:28:08 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 14:28:05 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 14:51:08 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,6 @@ void	IRC::_read_from_client(int fd)
 			std::cout << "Client disconnected" << std::endl;
 		else
 			std::cerr << "Error: Unable to read from client" << std::endl;
-		close(fd);
-		FD_CLR(fd, &this->_master_set);
 		this->remove_client(fd);
 	}
 	else
@@ -69,6 +67,7 @@ void IRC::remove_client(int fd)
     std::map<int, Client *>::iterator it = this->_clients.find(fd);
     if (it != this->_clients.end())
     {
+        FD_CLR(fd, &this->_master_set);
         delete it->second;
         this->_clients.erase(it);
         this->_n_clients--;
