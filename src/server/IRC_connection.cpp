@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 10:28:08 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 18:09:16 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 18:32:29 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,19 @@ void	IRC::_read_from_client(int fd)
                 this->remove_client(fd);
                 return ;   
             }
-            if (this->_clients[fd]->logged_in)
+            // if nickname is already in use, remove client
+            if (this->_nicknames.find(this->_clients[fd]->nickname) != this->_nicknames.end())
+            {
+                std::cerr << RED << "SERVER: Error: Nickname already in use" << RESET << std::endl;
+                std::string errorMessage = ":server.hostname 433 * " + this->_clients[fd]->nickname + " :Nickname is already in use\r\n";
+                if (send(fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
+                {
+                    std::cerr << RED << "SERVER: Error sending nickname error message to client" << RESET << std::endl;
+                }
+                this->remove_client(fd);
+                return ;
+            }
+            else if (this->_clients[fd]->logged_in)
                 this->_nicknames[this->_clients[fd]->nickname] = fd;
         }
 	}
