@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 10:28:08 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 14:51:08 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 17:15:09 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void IRC::_new_connection(void)
     // Insert the client into the map using the fd as the key
     this->_clients[client->fd] = client;
     this->_n_clients++;
-    std::cout << "New client connected with fd: " << client->fd << std::endl << std::endl;
+    std::cout << BLUE << "SERVER: New client connected with fd: " << client->fd << RESET << std::endl;
 }
 
 
@@ -43,16 +43,17 @@ void	IRC::_read_from_client(int fd)
 	if (this->_bytes_read <= 0)
 	{
 		if (this->_bytes_read == 0)
-			std::cout << "Client disconnected" << std::endl;
+			std::cout << BLUE << "SERVER: Client disconnected" << RESET << std::endl;
 		else
-			std::cerr << "Error: Unable to read from client" << std::endl;
+			std::cerr << RED << "SERVER: Error: Unable to read from client" << RESET << std::endl;
 		this->remove_client(fd);
 	}
 	else
 	{
 		this->_buffer[this->_bytes_read] = '\0';
-		std::cout << "Received: " << this->_buffer << std::endl;
-		this->_clients[fd]->command_handler(this->_buffer);
+		std::cout << GREEN << "CLIENT: " << this->_buffer << RESET << std::endl;
+        if (!this->_clients[fd]->logged_in)
+            this->_clients[fd]->login(this->_buffer);
 	}
 }
 
@@ -71,8 +72,8 @@ void IRC::remove_client(int fd)
         delete it->second;
         this->_clients.erase(it);
         this->_n_clients--;
-        std::cout << "Client with fd: " << fd << " has been removed." << std::endl;
+        std::cout << "SERVER: Client with fd: " << fd << " has been removed." << std::endl;
     }
     else
-        std::cout << "Client with fd: " << fd << " not found!" << std::endl;
+        std::cout << "SERVER: Client with fd: " << fd << " not found!" << std::endl;
 }

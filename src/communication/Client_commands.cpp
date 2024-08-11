@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 19:12:26 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 16:01:53 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 17:15:17 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ std::vector<std::string> split_cmd(const std::string& str)
  * 
  * @note Ignore unhandled commands (e.g. PING, PONG, CAP, etc.)
  */
-void	Client::command_handler(std::string command)
+void	Client::login(std::string command)
 {
 	std::vector<std::string> cmd = split_cmd(command);
 	if (cmd.size() == 0)
@@ -61,16 +61,12 @@ void	Client::command_handler(std::string command)
 			return ;
 		this->_cmd_user(cmd[1], cmd[2], cmd[3], cmd[4]);
 	}
-	else if (cmd[0] == "QUIT")
-	{
-		this->_cmd_quit();
-	}
 
     if (this->_password && this->_nickname != "" && this->_username != "" && this->_realname != "")
     {
         std::string welcomeMessage = ":server.hostname 001 " + this->_nickname + " :Welcome to the Internet Relay Network " + this->_nickname + "!" + this->_username + "@" + this->_hostname + "\r\n";
         if (send(this->fd, welcomeMessage.c_str(), welcomeMessage.length(), 0) < 0) {
-            std::cerr << "Error sending welcome message to client" << std::endl;
+            std::cerr << RED << "SERVER: Error sending welcome message to client" << RESET << std::endl;
         }
         this->logged_in = true;
     }
@@ -86,15 +82,15 @@ void	Client::_cmd_pass(std::string password)
 	this->_password = false;
 	if (password == IRC::getInstance()->getPassword())
 	{
-		std::cout << "Password accepted" << std::endl;
+		std::cout << BLUE << "SERVER: Password accepted" << RESET << std::endl;
 		this->_password = true;
 	}
 	else
 	{
-		std::cout << "Password incorrect" << std::endl;
+		std::cerr << RED << "SERVER: Password incorrect" << RESET << std::endl;
 		std::string errorMessage = ":server.hostname 464 * :Password incorrect\r\n";
         if (send(this->fd, errorMessage.c_str(), errorMessage.length(), 0) < 0) {
-            std::cerr << "Error sending password error message to client" << std::endl;
+            std::cerr << RED << "SERVER: Error sending password error message to client" << RESET << std::endl;
         }
 		this->_cmd_quit();
 	}

@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 13:24:44 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/07 14:51:02 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 17:10:48 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	IRC::_create_socket(void)
 	this->_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (this->_socket_fd < 0)
 	{
-		std::cerr << "Error: Unable to create socket" << std::endl;
+		std::cerr << RED << "SERVER: Error: Unable to create socket" << RESET << std::endl;
 		exit(1);
 	}
 }
@@ -44,7 +44,7 @@ void	IRC::_bind_socket(void)
     int optval = 1;
 	if (setsockopt(this->_socket_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0 ||
         setsockopt(this->_socket_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval)) < 0) {
-        std::cerr << "Error: Unable to set socket options" << std::endl;
+        std::cerr << RED << "SERVER: Error: Unable to set socket options" << RESET << std::endl;
         close(this->_socket_fd);
         exit(1);
     }
@@ -55,7 +55,7 @@ void	IRC::_bind_socket(void)
 	this->_max_fd = this->_socket_fd;
 	if (bind(this->_socket_fd, (struct sockaddr *)&this->_serv_addr, sizeof(this->_serv_addr)) < 0)
 	{
-		std::cerr << "Error: Unable to bind socket" << std::endl;
+		std::cerr << RED << "SERVER: Error: Unable to bind socket" << RESET << std::endl;
 		exit(1);
 	}
 }

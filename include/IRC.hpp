@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 13:16:01 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 14:27:51 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 17:00:00 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,9 @@ private:
 	socklen_t			_serv_len;
 	int					_max_fd;
 	int					_n_clients;
-	std::map<int, Client *> _clients;
+	std::map<int, Client *>             _clients;
+	std::map<std::string, Channel *>    _channels;
+    std::map<std::string, int>          _nicknames;
 	// fd_set for select
 	fd_set				_read_set;
 	fd_set				_write_set;

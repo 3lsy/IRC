@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 14:58:50 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/04 21:50:35 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 17:06:26 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void	IRC::_init_fd_sets(void)
 	n_fds = select(this->_max_fd + 1, &this->_read_set, &this->_write_set, NULL, NULL);
 	if (n_fds < 0 && errno != EINTR)
 	{
-		std::cerr << "Error: select error: " << strerror(errno) << std::endl;
+		std::cerr << RED << "SERVER: Error: select error: " << strerror(errno) << RESET << std::endl;
 		exit(1);
 	}
 }
@@ -61,7 +61,7 @@ void	IRC::_event_search(void)
  * @brief Main loop for the server
  */
 void IRC::serve(void) {
-    std::cout << "IRC server started on port " << _port << std::endl;
+    std::cout << BLUE << "SERVER: IRC server started on port " << _port << RESET << std::endl;
 	FD_ZERO(&this->_master_set);
 	FD_SET(this->_socket_fd, &this->_master_set);
 	this->_max_fd = this->_socket_fd;

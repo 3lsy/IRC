@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 10:44:36 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 15:09:46 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 17:12:04 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,15 +22,15 @@ Client::Client(int server_fd) : _password(false), _nickname(""), _username(""), 
 	this->fd = accept(server_fd, (struct sockaddr *)&this->socket_addr, &this->socket_len);
 	if (this->fd < 0)
 	{
-		std::cerr << "Error: Unable to accept connection" << std::endl;
+		std::cerr << RED << "SERVER: Error: Unable to accept connection" << RESET << std::endl;
 		return ;
 	}
-	std::cout << "New connection from " << inet_ntoa(this->socket_addr.sin_addr) << std::endl;
+	std::cout << BLUE << "SERVER: New connection from " << inet_ntoa(this->socket_addr.sin_addr) << RESET << std::endl;
 }
 
 Client::~Client(void) {
 	if (this->fd >= 0) {
         close(this->fd);
-        std::cout << "Client socket closed" << std::endl;
+        std::cout << BLUE << "SERVER: Client socket closed" << RESET << std::endl;
     }
 }

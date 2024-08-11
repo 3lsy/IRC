@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 13:14:18 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 16:14:51 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 17:04:36 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,5 +33,11 @@
 # include <cerrno>
 # include <map>
 # include <algorithm>
+
+// ANSI color codes
+# define RESET   "\033[0m"
+# define BLUE    "\033[34m"
+# define GREEN   "\033[32m"
+# define RED     "\033[31m"
 
 #endif

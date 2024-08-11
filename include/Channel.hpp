@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 17:33:12 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 16:42:38 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 16:51:34 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@ class Client;
 class Channel {
 	private:
 		// Attributes
-		std::string		_name;
-		std::string		_password;
+		std::string		        _name;
+		std::string	        	_password;
 		std::map<int, Client *>	_members;
 		std::map<int, Client *>	_operators;
 		// Methods
