@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 10:28:08 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 17:42:09 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 18:02:25 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,8 +54,12 @@ void	IRC::_read_from_client(int fd)
 		std::cout << GREEN << "CLIENT: " << this->_buffer << RESET << std::endl;
         if (!this->_clients[fd]->logged_in)
         {
-            this->_clients[fd]->login(this->_buffer);
-            if (this->_clients[fd]->logged_in && this->_nicknames.find(this->_clients[fd]->nickname) == this->_nicknames.end())
+            if (this->_clients[fd]->login(this->_buffer) == false)
+            {
+                this->remove_client(fd);
+                return ;   
+            }
+            if (this->_clients[fd]->logged_in)
                 this->_nicknames[this->_clients[fd]->nickname] = fd;
         }
 	}
@@ -68,8 +72,9 @@ void	IRC::_read_from_client(int fd)
  */
 void IRC::remove_client(int fd)
 {
-    // if (this->_nicknames.find(this->_clients[fd]->nickname) != this->_nicknames.end())
-        // this->_nicknames.erase(this->_clients[fd]->nickname);
+    // if nickname in map, erase it
+    if (this->_nicknames.find(this->_clients[fd]->nickname) != this->_nicknames.end())
+        this->_nicknames.erase(this->_clients[fd]->nickname);
     // Find the client in the map
     std::map<int, Client *>::iterator it = this->_clients.find(fd);
     if (it != this->_clients.end())

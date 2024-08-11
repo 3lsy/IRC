@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 19:12:26 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 17:40:03 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 17:55:42 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,27 +38,30 @@ std::vector<std::string> split_cmd(const std::string& str)
  * 
  * @note Ignore unhandled commands (e.g. PING, PONG, CAP, etc.)
  */
-void	Client::login(std::string command)
+bool Client::login(std::string command)
 {
+    bool    success;
+
+    success = true;
 	std::vector<std::string> cmd = split_cmd(command);
 	if (cmd.size() == 0)
-		return ;
+		return (true);
 	if (cmd[0] == "PASS")
 	{
 		if (cmd.size() < 2)
-			return ;
-		this->_cmd_pass(cmd[1]);
+			return (false);
+		success = this->_cmd_pass(cmd[1]);
 	}
 	else if (cmd[0] == "NICK")
 	{
 		if (cmd.size() < 2)
-			return ;
+			return (false);
 		this->_cmd_nick(cmd[1]);
 	}
 	else if (cmd[0] == "USER")
 	{
 		if (cmd.size() < 5)
-			return ;
+			return (false);
 		this->_cmd_user(cmd[1], cmd[2], cmd[3], cmd[4]);
 	}
 
@@ -70,6 +73,7 @@ void	Client::login(std::string command)
         }
         this->logged_in = true;
     }
+    return (success);
 }
 
 /**
@@ -77,13 +81,14 @@ void	Client::login(std::string command)
  * 
  * @param password The password received from the client
  */
-void	Client::_cmd_pass(std::string password)
+bool	Client::_cmd_pass(std::string password)
 {
 	this->_password = false;
 	if (password == IRC::getInstance()->getPassword())
 	{
 		std::cout << BLUE << "SERVER: Password accepted" << RESET << std::endl;
 		this->_password = true;
+        return (true);
 	}
 	else
 	{
@@ -92,7 +97,7 @@ void	Client::_cmd_pass(std::string password)
         if (send(this->fd, errorMessage.c_str(), errorMessage.length(), 0) < 0) {
             std::cerr << RED << "SERVER: Error sending password error message to client" << RESET << std::endl;
         }
-		this->_cmd_quit();
+		return (false);
 	}
 }
 
