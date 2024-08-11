@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 13:22:11 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 17:12:01 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 17:46:18 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ IRC::IRC(int port, std::string password):
 
 	this->_create_socket();
 	this->_bind_socket();
+    opt = 1;
 	if (setsockopt(this->_socket_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
 	{
 		std::cerr << RED << "SERVER: Error: Unable to set socket options" << RESET << std::endl;
