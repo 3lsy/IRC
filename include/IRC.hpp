@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 13:16:01 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/09 11:41:52 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 14:27:51 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,17 +37,16 @@ private:
 	int					_bytes_read;
 	bool				_running;
 	// Methods
-	void	_create_socket(void);
-	void	_bind_socket(void);
-	void	_init_fd_sets(void);
+	void				_create_socket(void);
+	void				_bind_socket(void);
+	void				_init_fd_sets(void);
 	// Server methods
-	void	_new_connection(void);
-	void	_event_search(void);
-	void	_read_from_client(int fd);
-	void	_remove_client(int fd);
+	void				_new_connection(void);
+	void				_event_search(void);
+	void				_read_from_client(int fd);
 
 	// Static pointer to hold the singleton instance
-    static IRC* instance;
+	static IRC* instance;
 	// Private constructor to prevent instantiation
 	IRC(int port, std::string password);
 	~IRC(void);
@@ -55,14 +54,15 @@ private:
 public:
 	// Methods
 	// Public static method to access the singleton instance
-    static IRC*	getInstance(int port = 0, std::string password = "");
+	static IRC*			getInstance(int port = 0, std::string password = "");
 
 	// Server control methods
-	void		stop_server(void);
-	void		serve();
+	void				stop_server(void);
+	void				serve();
+	void				remove_client(int fd);
 	// Static methods
-	static bool	valid_port(int port);
-	static void signal_handler(int signum);
+	static bool			valid_port(int port);
+	static void			signal_handler(int signum);
 	//getter
 	int					getPort(void) const;
 	std::string			getPassword(void) const;
