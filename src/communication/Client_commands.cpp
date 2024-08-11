@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 19:12:26 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 17:15:17 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 17:40:03 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ std::vector<std::string> split_cmd(const std::string& str)
 }
 
 /**
- * @brief This function handles the commands received from the client
+ * @brief Handles the login process for the client
  * 
  * @param command The command received from the client
  * 
@@ -62,9 +62,9 @@ void	Client::login(std::string command)
 		this->_cmd_user(cmd[1], cmd[2], cmd[3], cmd[4]);
 	}
 
-    if (this->_password && this->_nickname != "" && this->_username != "" && this->_realname != "")
+    if (this->_password && this->nickname != "" && this->_username != "" && this->_realname != "")
     {
-        std::string welcomeMessage = ":server.hostname 001 " + this->_nickname + " :Welcome to the Internet Relay Network " + this->_nickname + "!" + this->_username + "@" + this->_hostname + "\r\n";
+        std::string welcomeMessage = ":server.hostname 001 " + this->nickname + " :Welcome to the Internet Relay Network " + this->nickname + "!" + this->_username + "@" + this->_hostname + "\r\n";
         if (send(this->fd, welcomeMessage.c_str(), welcomeMessage.length(), 0) < 0) {
             std::cerr << RED << "SERVER: Error sending welcome message to client" << RESET << std::endl;
         }
@@ -103,7 +103,7 @@ void	Client::_cmd_pass(std::string password)
  */
 void	Client::_cmd_nick(std::string nickname)
 {
-    this->_nickname = nickname;
+    this->nickname = nickname;
 }
 
 /**
