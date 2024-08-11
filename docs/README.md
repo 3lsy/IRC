@@ -16,6 +16,29 @@
 
 ## Usage
 
+### Client
+
+We chose [WeeChat](https://weechat.org/) as client, even though we followed the **IRCv3** Protocol that is compatible with most of the IRC current clients.
+
+#### Add the server in the WeeChat client
+
+```bash
+/server add my_irc localhost/6667 -password=MYSECUREPASSWORD
+```
+
+> [!NOTE]
+> To change the password if needed, we can do that with:
+> ```bash
+> /set irc.server.my_irc.password CORRECTPASSWORD
+> /save
+> ```
+
+#### Connect to the IRC server
+
+```bash
+/connect my_irc
+```
+
 ### Network
 
 #### Ports

@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 19:12:26 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 14:45:16 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 14:52:52 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,6 +127,5 @@ void	Client::_cmd_user(std::string username, std::string hostname,
  */
 void	Client::_cmd_quit(void)
 {
-    close(this->fd);
     IRC::getInstance()->remove_client(this->fd);
 }
