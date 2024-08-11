@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 19:12:26 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 15:00:56 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 15:04:25 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,14 @@ void	Client::command_handler(std::string command)
 	{
 		this->_cmd_quit();
 	}
-	//check if PASS, NICK, USER were correct, to send a welcome message
+
+    if (this->_password && this->_nickname != "" && this->_username != "" && this->_realname != "")
+    {
+        std::string welcomeMessage = ":server.hostname 001 " + this->_nickname + " :Welcome to the Internet Relay Network " + this->_nickname + "!" + this->_username + "@" + this->_hostname + "\r\n";
+        if (send(this->fd, welcomeMessage.c_str(), welcomeMessage.length(), 0) < 0) {
+            std::cerr << "Error sending welcome message to client" << std::endl;
+        }
+    }
 }
 
 /**
