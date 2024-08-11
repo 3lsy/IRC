@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 13:22:11 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/03 13:37:50 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/09 12:05:13 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,15 +52,16 @@ IRC::IRC(int port, std::string password):
 }
 
 IRC::~IRC(void) {
-    std::cout << "IRC server shutting down" << std::endl;
-	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-        delete *it;
-    }
-    _clients.clear();
+	std::cout << "IRC server shutting down" << std::endl;
+
+	for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+		delete it->second;
+	}
+	_clients.clear();
 	if (this->_socket_fd >= 0) {
-        close(this->_socket_fd);
-        std::cout << "Server socket closed" << std::endl;
-    }
+		close(this->_socket_fd);
+		std::cout << "Server socket closed" << std::endl;
+	}
 }
 
 IRC* IRC::getInstance(int port, std::string password) {
@@ -68,4 +69,12 @@ IRC* IRC::getInstance(int port, std::string password) {
         instance = new IRC(port, password);
     }
     return instance;
+}
+
+std::string IRC::getPassword(void) const {
+	return this->_password;
+}
+
+int IRC::getPort(void) const {
+	return this->_port;
 }

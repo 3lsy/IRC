@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 13:14:18 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/02 17:14:57 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/09 11:40:56 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,10 @@
 #include <cstdio>           // For standard I/O functions
 #include <cstdlib>          // For general utilities like exit()
 #include <vector>           // For std::vector
-
-//test
-#include <cerrno>           // For errno
+#include <string>
+#include <sstream>
+#include <cerrno>
+#include <map>
+#include <algorithm>
 
 #endif

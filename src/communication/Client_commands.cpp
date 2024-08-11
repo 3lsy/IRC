@@ -1,0 +1,88 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Client_commands.cpp                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/08/07 19:12:26 by echavez-          #+#    #+#             */
+/*   Updated: 2024/08/09 12:08:20 by echavez-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "Client.hpp"
+#include "IRC.hpp"
+
+/**
+ * @brief Splits a string into a vector of strings separated by spaces
+ */
+std::vector<std::string> split_cmd(const std::string& str)
+{
+    std::vector<std::string> result;
+    std::istringstream stream(str);
+    std::string word;
+
+    while (stream >> word) {
+        result.push_back(word);
+    }
+
+    return result;
+}
+
+/**
+ * @brief This function handles the commands received from the client
+ * 
+ * @param command The command received from the client
+ * 
+ * @format: <CMD> <PARAMS> :<TRAILING>
+ * 
+ * @note Ignore unhandled commands (e.g. PING, PONG, CAP, etc.)
+ */
+void	Client::command_handler(std::string command)
+{
+	std::vector<std::string> cmd = split_cmd(command);
+	if (cmd.size() == 0)
+		return ;
+	if (cmd[0] == "PASS")
+	{
+		if (cmd.size() < 2)
+			return ;
+		this->_cmd_pass(cmd[1]);
+	}
+	else if (cmd[0] == "NICK")
+	{
+		if (cmd.size() < 2)
+			return ;
+		this->_cmd_nick(cmd[1]);
+	}
+	else if (cmd[0] == "USER")
+	{
+		if (cmd.size() < 5)
+			return ;
+		this->_cmd_user(cmd[1], cmd[2], cmd[3], cmd[4]);
+	}
+	else if (cmd[0] == "QUIT")
+	{
+		this->_cmd_quit();
+	}
+	//check if PASS, NICK, USER were correct, to send a welcome message
+}
+
+/**
+ * @brief Handles the PASS command
+ * 
+ * @param password The password received from the client
+ */
+void	Client::_cmd_pass(std::string password)
+{
+	this->_password = false;
+	if (password == IRC::getInstance()->getPassword())
+	{
+		std::cout << "Password accepted" << std::endl;
+		this->_password = true;
+	}
+	else
+	{
+		send(this->fd, ":server.hostname 464 * :Password incorrect\r\n", 39, 0);
+	}
+}

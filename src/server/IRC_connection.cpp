@@ -6,30 +6,37 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 10:28:08 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/07 15:14:26 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/09 12:02:38 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "IRC.hpp"
+#include "Client.hpp"
 
-void	IRC::_new_connection(void)
+void IRC::_new_connection(void)
 {
-	// Client new client(this->_socket_fd);
-	Client *client = new Client(this->_socket_fd);
+    Client *client = new Client(this->_socket_fd);
 
-	if (client->fd < 0) {
-		delete client;
-		return ;
-	}
-	FD_SET(client->fd, &this->_master_set);
-	if (client->fd > this->_max_fd) {
-		this->_max_fd = client->fd;
-	}
-	this->_clients.push_back(client);
-	this->_n_clients++;
-	 std::cout << "New client connected with fd: " << client->fd << std::endl << std::endl;
+    if (client->fd < 0) {
+        delete client;
+        return ;
+    }
+    FD_SET(client->fd, &this->_master_set);
+    if (client->fd > this->_max_fd) {
+        this->_max_fd = client->fd;
+    }
+    // Insert the client into the map using the fd as the key
+    this->_clients[client->fd] = client;
+    this->_n_clients++;
+    std::cout << "New client connected with fd: " << client->fd << std::endl << std::endl;
 }
 
+
+/**
+ * @brief This function reads from the client and sends a response back
+ * 
+ * @todo Correct: errno = "Connection reset by peer" when client disconnects (recv returns -1)
+ */
 void	IRC::_read_from_client(int fd)
 {
 	this->_bytes_read = recv(fd, this->_buffer, sizeof(this->_buffer), 0);
@@ -41,38 +48,32 @@ void	IRC::_read_from_client(int fd)
 			std::cerr << "Error: Unable to read from client" << std::endl;
 		close(fd);
 		FD_CLR(fd, &this->_master_set);
-		this->_n_clients--;
 		this->_remove_client(fd);
 	}
 	else
 	{
 		this->_buffer[this->_bytes_read] = '\0';
 		std::cout << "Received: " << this->_buffer << std::endl;
-		send(fd, this->_buffer, this->_bytes_read, 0);
-		send(fd, ":server.hostname 001 echavez- :Welcome to the IRC Network echavez-!echavez-@echavez-", 84, 0);
-		// for (int i_fd = 0; i_fd <= this->_max_fd; ++i_fd)
-		// {
-		// 	if (FD_ISSET(i_fd, &this->_write_set))
-		// 	{
-		// 		send(i_fd, ":server.hostname 001 echavez- :Welcome to the IRC Network echavez-!echavez-@echavez-", 84, 0);
-		// 	}
-		// }
+		this->_clients[fd]->command_handler(this->_buffer);
 	}
 }
 
-void	IRC::_remove_client(int fd)
+/**
+ * @brief This function removes a client from the map and deletes the object
+ * 
+ * @param fd The file descriptor of the client to remove
+ */
+void IRC::_remove_client(int fd)
 {
-	std::cout << "Removing client with fd: " << fd << std::endl << std::endl;
-	std::vector<Client *>::iterator it = this->_clients.begin();
-	while (it != this->_clients.end())
-	{
-		if ((*it)->fd == fd)
-		{
-			delete *it;
-			it = this->_clients.erase(it);
-			break;
-		}
-		else
-			++it;
-	}
+    // Find the client in the map
+    std::map<int, Client *>::iterator it = this->_clients.find(fd);
+    if (it != this->_clients.end())
+    {
+        delete it->second;
+        this->_clients.erase(it);
+        this->_n_clients--;
+        std::cout << "Client with fd: " << fd << " has been removed." << std::endl;
+    }
+    else
+        std::cout << "Client with fd: " << fd << " not found!" << std::endl;
 }

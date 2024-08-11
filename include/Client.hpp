@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 10:38:37 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/03 12:06:45 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/09 12:01:59 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,18 +22,20 @@ class Client {
 		socklen_t			_socket_len;
 		// privileged channels
 		// member channels
+		bool				_password;
 		std::string			_nickname;
 		std::string			_username;
 		std::string			_realname;
-		std::string			_password;
 		std::string			_hostname;
 		std::string			_servername;
 		std::string			_mode;
 		std::string			_ip;
-		std::string			_gecos;
-		// Methods
-		void	_parse_message(std::string message);
-		void	_send_message(std::string message);
+		// Command methods
+		void	_cmd_pass(std::string password);
+		void	_cmd_nick(std::string nickname);
+		void	_cmd_user(std::string username, std::string hostname, 
+						std::string servername, std::string realname);
+		void	_cmd_quit(void);
 	public:
 		// Attributes
 		int					fd;
@@ -43,9 +45,7 @@ class Client {
 		Client(void);
 		Client(int fd);
 		~Client(void);
-		void	join_channel(std::string channel);
-		void	leave_channel(std::string channel);
-		void	send_message(std::string message);
+		void	command_handler(std::string command);
 };
 
 #endif

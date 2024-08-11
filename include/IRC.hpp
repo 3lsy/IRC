@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 13:16:01 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/03 13:00:10 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/09 11:41:52 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ private:
 	socklen_t			_serv_len;
 	int					_max_fd;
 	int					_n_clients;
-	std::vector<Client *>	_clients;
+	std::map<int, Client *> _clients;
 	// fd_set for select
 	fd_set				_read_set;
 	fd_set				_write_set;
@@ -63,6 +63,9 @@ public:
 	// Static methods
 	static bool	valid_port(int port);
 	static void signal_handler(int signum);
+	//getter
+	int					getPort(void) const;
+	std::string			getPassword(void) const;
 };
 
 #endif
