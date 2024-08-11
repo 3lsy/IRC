@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 19:12:26 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 14:32:04 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 14:45:16 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,8 @@ void	Client::command_handler(std::string command)
  * @brief Handles the PASS command
  * 
  * @param password The password received from the client
+ * 
+ * @todo: send messape with nickname
  */
 void	Client::_cmd_pass(std::string password)
 {
@@ -85,10 +87,11 @@ void	Client::_cmd_pass(std::string password)
 	else
 	{
 		std::cout << "Password incorrect" << std::endl;
-		        std::string errorMessage = ":server.hostname 464 * :Password incorrect\r\n";
+		std::string errorMessage = ":server.hostname 464 * :Password incorrect\r\n";
         if (send(this->fd, errorMessage.c_str(), errorMessage.length(), 0) < 0) {
             std::cerr << "Error sending password error message to client" << std::endl;
         }
+		this->_cmd_quit();
 	}
 }
 
