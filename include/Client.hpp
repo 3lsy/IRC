@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 10:38:37 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 20:15:24 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/11 21:55:37 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ class Client {
 		~Client(void);
 		//command handler for PASS, NICK, USER, QUIT
 		bool	            login(std::string command);
+		void				send_message(int client_fd, std::string message);
 };
 
 #endif
