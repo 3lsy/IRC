@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/11 19:47:39 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 22:47:04 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/18 21:57:52 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,15 @@ void    IRC::_interaction(std::string command, int client_fd)
         else if (cmd.size() == 3)
             this->_cmd_join(cmd[1], cmd[2], client_fd);
         else
-            return;
+            return ;
     }
+	else if (cmd[0] == "PRIVMSG")
+	{
+		if (cmd.size() == 3)
+			this->_cmd_privmsg(cmd[1], cmd[2], client_fd);
+		else
+			return ;
+	}
 }
 
 /**
@@ -55,6 +62,9 @@ void    IRC::_cmd_join(std::string channels, std::string passwords, int client_f
 {
     std::vector<std::string> chans = split_by(channels, ',');
     std::vector<std::string> pass = split_by(passwords, ',');
+	// if chans.size() != pass.size() then return
+	if (chans.size() != pass.size())
+		return ;
     for (size_t i = 0; i < chans.size(); i++)
     {
         if (this->_channels.find(chans[i]) == this->_channels.end())
@@ -91,7 +101,7 @@ void    IRC::_cmd_privmsg(std::string target, std::string message, int client_fd
 	if (target[0] == '#' || target[0] == '&')
 	{
 		if (this->_channels.find(target) != this->_channels.end()) {
-			this->_channels[target]->send_message(target, message);
+			this->_send_to_channel(client_fd, this->_channels[target], message);
 		}
 		else {
 			std::cerr << RED << "SERVER: Error: No such channel" << RESET << std::endl;
@@ -105,7 +115,7 @@ void    IRC::_cmd_privmsg(std::string target, std::string message, int client_fd
 	else
 	{
 		if (this->_clients.find(this->_nicknames[target]) != this->_clients.end()) {
-			this->_clients[this->_nicknames[target]]->send_message(client_fd, message);
+			this->_send_to_client(client_fd, this->_nicknames[target], message);
 		}
 		else {
 			std::cerr << RED << "SERVER: Error: No such client" << RESET << std::endl;
@@ -118,10 +128,29 @@ void    IRC::_cmd_privmsg(std::string target, std::string message, int client_fd
 	}
 }
 
-void	Channel::send_message(std::string _channel_name, std::string message) {
+void	IRC::_send_to_channel(int client_fd, Channel *channel, std::string message) {
+	// with the channel name, search the channel in hashmap. It gives me the channel object whicn contains the list of members of the channel
+	std::map<std::string, Client *> members = channel->get_members();
+	std::map<std::string, Client *>::iterator it;
+	for (it = members.begin(); it != members.end(); it++)
+	{
+		if (FD_ISSET(it->second->fd, &this->_write_set) && it->second->fd != client_fd)
+		{
+			if (send(it->second->fd, message.c_str(), message.length(), 0) < 0)
+			{
+				std::cerr << RED << "SERVER: Error sending message to client" << RESET << std::endl;
+			}
+		}
+	}
 }
 
-void	Client::send_message(int client_fd, std::string message) {
-	// Method implementation
-	// Send message to client_fd
+
+void	IRC::_send_to_client(int client_fd, int target_fd, std::string message) {
+	if (FD_ISSET(target_fd, &this->_write_set) && target_fd != client_fd)
+	{
+		if (send(target_fd, message.c_str(), message.length(), 0) < 0)
+		{
+			std::cerr << RED << "SERVER: Error sending message to client" << RESET << std::endl;
+		}
+	}
 }

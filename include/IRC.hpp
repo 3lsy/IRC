@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 13:16:01 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 22:46:39 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/18 21:33:56 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include "lib.h"
 # include "Client.hpp"
+# include "Channel.hpp"
 
 class IRC {
 private:
@@ -47,11 +48,13 @@ private:
 	void				_event_search(void);
 	void				_read_from_client(int fd);
 	void				_read_client_message(int fd);
-
     //command handler for communication (PRIVMSG, JOIN, PART, etc)
     void                _interaction(std::string command, int fd);
     void                _cmd_join(std::string channels, std::string passwords, int client_fd);
 	void				_cmd_privmsg(std::string target, std::string message, int client_fd);
+	//send messages methods
+	void				_send_to_channel(int client_fd, Channel *channel, std::string message);
+	void				_send_to_client(int client_fd, int target_fd, std::string message);
 
 	// Static pointer to hold the singleton instance
 	static IRC*			instance;

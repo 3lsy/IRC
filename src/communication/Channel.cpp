@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 18:12:53 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 22:47:12 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/18 21:55:15 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,15 @@ Channel::Channel(std::string name, std::string password): invite_only(false), to
 Channel::Channel(std::string name): invite_only(false), topic_locked(false), key_password(false), user_limit(0), _name(name), _password("")
 {
     // Constructor implementation
+}
+
+Channel::Channel(const Channel &other) {
+	(void)other;
+}
+
+Channel& Channel::operator=(const Channel &other) {
+	(void)other;
+	return (*this);
 }
 
 Channel::~Channel() {
@@ -107,5 +116,18 @@ void    Channel::change_topic(Client *client, std::string topic) {
         }
     }
     this->topic = topic;
+}
+
+// setters and getters
+std::map<std::string, Client *> Channel::get_members(void) {
+	return (this->_members);
+}
+
+std::map<std::string, Client *> Channel::get_operators(void) {
+	return (this->_operators);
+}
+
+std::map<std::string, Client *> Channel::get_invited(void) {
+	return (this->_invited);
 }
 
