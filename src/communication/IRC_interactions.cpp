@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/11 19:47:39 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/18 21:57:52 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/18 23:26:20 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,7 @@ void    IRC::_cmd_join(std::string channels, std::string passwords, int client_f
 {
     std::vector<std::string> chans = split_by(channels, ',');
     std::vector<std::string> pass = split_by(passwords, ',');
-	// if chans.size() != pass.size() then return
-	if (chans.size() != pass.size())
+	if (pass.size() > 0 && chans.size() != pass.size())
 		return ;
     for (size_t i = 0; i < chans.size(); i++)
     {
@@ -132,18 +131,20 @@ void	IRC::_send_to_channel(int client_fd, Channel *channel, std::string message)
 	// with the channel name, search the channel in hashmap. It gives me the channel object whicn contains the list of members of the channel
 	std::map<std::string, Client *> members = channel->get_members();
 	std::map<std::string, Client *>::iterator it;
+	(void)client_fd;
 	for (it = members.begin(); it != members.end(); it++)
 	{
-		if (FD_ISSET(it->second->fd, &this->_write_set) && it->second->fd != client_fd)
+		if (FD_ISSET(it->second->fd, &this->_write_set))// && it->second->fd != client_fd) // to debug, this returns the message to the sender too
 		{
-			if (send(it->second->fd, message.c_str(), message.length(), 0) < 0)
+			std::cout << BLUE << "SERVER: Sending message to " << it->second->nickname << RESET << std::endl;
+			std::string message_cli = ":" + this->_clients[client_fd]->nickname + " PRIVMSG " + channel->get_name() + " " + message + "\r\n";
+			if (send(it->second->fd, message_cli.c_str(), message_cli.length(), 0) < 0)
 			{
 				std::cerr << RED << "SERVER: Error sending message to client" << RESET << std::endl;
 			}
 		}
 	}
 }
-
 
 void	IRC::_send_to_client(int client_fd, int target_fd, std::string message) {
 	if (FD_ISSET(target_fd, &this->_write_set) && target_fd != client_fd)

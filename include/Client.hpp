@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 10:38:37 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 21:55:37 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/18 21:43:39 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,6 @@ class Client {
 		// member channels
 		std::map<std::string, Channel*> _channels;
 		bool				_password;
-		std::string			_username;
-		std::string			_realname;
-		std::string			_hostname;
 		std::string			_servername;
 		std::string			_mode;
 		std::string			_ip;
@@ -42,6 +39,9 @@ class Client {
 		// Attributes
 		int					fd;
 		std::string			nickname;
+		std::string			username;
+		std::string			realname;
+		std::string			hostname;
         bool                logged_in;
 		struct sockaddr_in	socket_addr;
 		socklen_t			socket_len;

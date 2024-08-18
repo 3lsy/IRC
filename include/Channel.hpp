@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 17:33:12 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/18 21:43:59 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/18 22:53:27 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ class Channel {
 		std::map<std::string, Client *> get_members(void);
 		std::map<std::string, Client *> get_operators(void);
 		std::map<std::string, Client *> get_invited(void);
+		std::string						get_name(void);
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 10:28:08 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 22:48:02 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/18 22:03:36 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,8 +107,8 @@ void IRC::remove_client(int fd)
         delete it->second;
         this->_clients.erase(it);
         this->_n_clients--;
-        std::cout << "SERVER: Client with fd: " << fd << " has been removed." << std::endl;
+        std::cout << BLUE << "SERVER: Client with fd: " << fd << " has been removed." << RESET << std::endl;
     }
     else
-        std::cout << "SERVER: Client with fd: " << fd << " not found!" << std::endl;
+        std::cout << BLUE << "SERVER: Client with fd: " << fd << " not found!" << RESET << std::endl;
 }
