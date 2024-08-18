@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/11 18:27:01 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 20:15:34 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/18 21:45:32 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,9 +82,9 @@ bool Client::login(std::string command)
         this->_cmd_quit();
     }
 
-    if (this->_password && this->nickname != "" && this->_username != "" && this->_realname != "")
+    if (this->_password && this->nickname != "" && this->username != "" && this->realname != "")
     {
-        std::string welcomeMessage = ":server.hostname 001 " + this->nickname + " :Welcome to the Internet Relay Network " + this->nickname + "!" + this->_username + "@" + this->_hostname + "\r\n";
+        std::string welcomeMessage = ":server.hostname 001 " + this->nickname + " :Welcome to the Internet Relay Network " + this->nickname + "!" + this->username + "@" + this->hostname + "\r\n";
         std::cout << BLUE << "SERVER: Sending welcome message to client: " << this->nickname << RESET << std::endl;
         if (send(this->fd, welcomeMessage.c_str(), welcomeMessage.length(), 0) < 0) {
             std::cerr << RED << "SERVER: Error sending welcome message to client" << RESET << std::endl;
@@ -140,10 +140,10 @@ void	Client::_cmd_nick(std::string nickname)
 void	Client::_cmd_user(std::string username, std::string hostname, 
                         std::string servername, std::string realname)
 {
-    this->_username = username;
-    this->_hostname = hostname;
+    this->username = username;
+    this->hostname = hostname;
     this->_servername = servername;
-    this->_realname = realname;
+    this->realname = realname;
 }
 
 /**

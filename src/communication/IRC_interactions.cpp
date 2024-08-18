@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/11 19:47:39 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/18 21:17:01 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/18 21:27:01 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,10 +118,16 @@ void    IRC::_cmd_privmsg(std::string target, std::string message, int client_fd
 	}
 }
 
-void	Channel::send_message(std::string _channel_name, std::string message) {
+void	Channel::send_message(std::string _channel_name, std::string message)
+{
+    (void)_channel_name;
+    (void)message;
 }
 
-void	Client::send_message(int client_fd, std::string message) {
+void	Client::send_message(int client_fd, std::string message)
+{
 	// Method implementation
 	// Send message to client_fd
+    (void)client_fd;
+    (void)message;
 }

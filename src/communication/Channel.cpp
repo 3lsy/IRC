@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 18:12:53 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/18 21:16:54 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/18 21:50:10 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,10 @@ bool Channel::join(Client *client) {
     }
     // Add client to the channel
     this->_members[client->nickname] = client;
+    // :<nickname>!<user>@<host> JOIN :#toto
+    std::string message = ":" + client->nickname + "!" + client->username + "@" + client->hostname + " JOIN :" + this->_name + "\r\n";
+    send(client->fd, message.c_str(), message.length(), 0);
+    std::cout << BLUE << "SERVER: " << client->nickname << " joined " << this->_name << RESET << std::endl;
     return (true);
 }
 
@@ -91,6 +95,10 @@ bool Channel::join(Client *client, std::string password) {
     }
     // Add client to the channel
     this->_members[client->nickname] = client;
+    // :<nickname>!<user>@<host> JOIN :#toto
+    std::string message = ":" + client->nickname + "!" + client->username + "@" + client->hostname + " JOIN :" + this->_name + "\r\n";
+    send(client->fd, message.c_str(), message.length(), 0);
+    std::cout << BLUE << "SERVER: " << client->nickname << " joined " << this->_name << RESET << std::endl;
     return (true);
 }
 
