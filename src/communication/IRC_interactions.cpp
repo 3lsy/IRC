@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/11 19:47:39 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/18 23:26:20 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/24 11:58:13 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void    IRC::_interaction(std::string command, int client_fd)
     }
 	else if (cmd[0] == "PRIVMSG")
 	{
-		if (cmd.size() == 3)
+		if (cmd.size() >= 3)
 			this->_cmd_privmsg(cmd[1], cmd[2], client_fd);
 		else
 			return ;
