@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 10:28:08 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/18 22:03:36 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/24 09:59:19 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,16 @@ void IRC::_new_connection(void)
     std::cout << BLUE << "SERVER: New client connected with fd: " << client->fd << RESET << std::endl;
 }
 
+/**
+ * @brief This function reads from the client and sends a response back
+ * 
+ * @todo Correct: errno = "Connection reset by peer" when client disconnects (recv returns -1)
+ * 
+ * @param fd The file descriptor of the client
+ * 
+ * @note Client format messages: :<nickname>!<username>@<hostname> PRIVMSG <target> :<message>
+ * @note Server format messages: :<servername> 433 * <nickname> :Nickname is already in use
+ */
 void    IRC::_read_client_message(int fd)
 {
     if (!this->_clients[fd]->logged_in)
@@ -45,7 +55,7 @@ void    IRC::_read_client_message(int fd)
         if (this->_nicknames.find(this->_clients[fd]->nickname) != this->_nicknames.end())
         {
             std::cerr << RED << "SERVER: Error: Nickname already in use" << RESET << std::endl;
-            std::string errorMessage = ":server.hostname 433 * " + this->_clients[fd]->nickname + " :Nickname is already in use\r\n";
+            std::string errorMessage = ":" + std::string(SERVERNAME) + " 433 * " + this->_clients[fd]->nickname + " :Nickname is already in use\r\n";
             if (send(fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
             {
                 std::cerr << RED << "SERVER: Error sending nickname error message to client" << RESET << std::endl;

@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/11 19:47:39 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/18 23:26:20 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/24 10:27:19 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,11 @@ void    IRC::_interaction(std::string command, int client_fd)
     }
 	else if (cmd[0] == "PRIVMSG")
 	{
-		if (cmd.size() == 3)
-			this->_cmd_privmsg(cmd[1], cmd[2], client_fd);
+		if (cmd.size() >= 3)
+        {
+            std::string message = command.substr(command.find(cmd[2]));
+            this->_cmd_privmsg(cmd[1], message, client_fd);
+        }
 		else
 			return ;
 	}
@@ -64,6 +67,20 @@ void    IRC::_cmd_join(std::string channels, std::string passwords, int client_f
     std::vector<std::string> pass = split_by(passwords, ',');
 	if (pass.size() > 0 && chans.size() != pass.size())
 		return ;
+    // Check channel names contain # or & at the beginning
+    for (size_t i = 0; i < chans.size(); i++)
+    {
+        if (chans[i][0] != '#' && chans[i][0] != '&')
+        {
+            std::cerr << RED << "SERVER: Error: Invalid channel name"<< chans[i] << RESET << std::endl;
+            std::string errorMessage = ":" + std::string(SERVERNAME) + " 403 " + chans[i] + " :No such channel\r\n";
+            if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
+            {
+                std::cerr << RED << "SERVER: Error sending channel not found error message to client" << RESET << std::endl;
+            }
+            return ;
+        }
+    }
     for (size_t i = 0; i < chans.size(); i++)
     {
         if (this->_channels.find(chans[i]) == this->_channels.end())
@@ -94,6 +111,9 @@ void    IRC::_cmd_join(std::string channels, std::string passwords, int client_f
  * @param target The target of the message
  * @param message The message to send
  * @param client_fd The file descriptor of the client
+ * 
+ * @note Client format message: :<nickname>!<username>@<hostname> PRIVMSG <target> :<message>
+ * @note Server format message: :<servername> 403 <nickname> <target> :No such channel
  */
 void    IRC::_cmd_privmsg(std::string target, std::string message, int client_fd)
 {
@@ -103,8 +123,8 @@ void    IRC::_cmd_privmsg(std::string target, std::string message, int client_fd
 			this->_send_to_channel(client_fd, this->_channels[target], message);
 		}
 		else {
-			std::cerr << RED << "SERVER: Error: No such channel" << RESET << std::endl;
-			std::string errorMessage = ":server.hostname 403 " + this->_clients[client_fd]->nickname + target + " :No such channel\r\n";
+			std::cerr << RED << "SERVER: Error: No such channel: " << target << RESET << std::endl;
+			std::string errorMessage = ":" + std::string(SERVERNAME) + " 403 " + this->_clients[client_fd]->nickname + target + " :No such channel\r\n";
 			if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
 			{
 				std::cerr << RED << "SERVER: Error sending channel not found error message to client" << RESET << std::endl;
@@ -114,11 +134,13 @@ void    IRC::_cmd_privmsg(std::string target, std::string message, int client_fd
 	else
 	{
 		if (this->_clients.find(this->_nicknames[target]) != this->_clients.end()) {
+            std::cout << BLUE << "SERVER: Sending message to " << target << RESET << std::endl;
 			this->_send_to_client(client_fd, this->_nicknames[target], message);
 		}
 		else {
-			std::cerr << RED << "SERVER: Error: No such client" << RESET << std::endl;
-			std::string errorMessage = ":server.hostname 401 " + this->_clients[client_fd]->nickname + target + " :No such client\r\n";
+			std::cerr << RED << "SERVER: Error: No such client: " << target << RESET << std::endl;
+			std::string errorMessage = ":" + std::string(SERVERNAME) + " 401 " + this->_clients[client_fd]->nickname + " " + target + " :No such client\r\n";
+            std::cout << errorMessage << std::endl;
 			if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
 			{
 				std::cerr << RED << "SERVER: Error sending client not found error message to client" << RESET << std::endl;
@@ -127,8 +149,16 @@ void    IRC::_cmd_privmsg(std::string target, std::string message, int client_fd
 	}
 }
 
+/**
+ * @brief Sends a message to all the members of a channel
+ * 
+ * @param client_fd The file descriptor of the client
+ * @param channel The channel to send the message to
+ * @param message The message to send
+ * 
+ * @note Client format message: :<nickname>!<username>@<hostname> PRIVMSG <channel> :<message>
+ */
 void	IRC::_send_to_channel(int client_fd, Channel *channel, std::string message) {
-	// with the channel name, search the channel in hashmap. It gives me the channel object whicn contains the list of members of the channel
 	std::map<std::string, Client *> members = channel->get_members();
 	std::map<std::string, Client *>::iterator it;
 	(void)client_fd;
@@ -137,7 +167,7 @@ void	IRC::_send_to_channel(int client_fd, Channel *channel, std::string message)
 		if (FD_ISSET(it->second->fd, &this->_write_set))// && it->second->fd != client_fd) // to debug, this returns the message to the sender too
 		{
 			std::cout << BLUE << "SERVER: Sending message to " << it->second->nickname << RESET << std::endl;
-			std::string message_cli = ":" + this->_clients[client_fd]->nickname + " PRIVMSG " + channel->get_name() + " " + message + "\r\n";
+			std::string message_cli = ":" + this->_clients[client_fd]->nickname + '!' + this->_clients[client_fd]->username + '@' + this->_clients[client_fd]->hostname + " PRIVMSG " + channel->get_name() + " " + message + "\r\n";
 			if (send(it->second->fd, message_cli.c_str(), message_cli.length(), 0) < 0)
 			{
 				std::cerr << RED << "SERVER: Error sending message to client" << RESET << std::endl;
@@ -146,10 +176,20 @@ void	IRC::_send_to_channel(int client_fd, Channel *channel, std::string message)
 	}
 }
 
+/**
+ * @brief Sends a message to a client
+ * 
+ * @param client_fd The file descriptor of the client sending the message
+ * @param target_fd The file descriptor of the target client
+ * @param message The message to send
+ * 
+ * @note Client format message: :<nickname>!<username>@<hostname> PRIVMSG <target> :<message>
+ */
 void	IRC::_send_to_client(int client_fd, int target_fd, std::string message) {
-	if (FD_ISSET(target_fd, &this->_write_set) && target_fd != client_fd)
+	if (FD_ISSET(target_fd, &this->_write_set))// && target_fd != client_fd) // for testing purposes, this returns the message to the sender too
 	{
-		if (send(target_fd, message.c_str(), message.length(), 0) < 0)
+        std::string message_cli = ":" + this->_clients[client_fd]->nickname + '!' + this->_clients[client_fd]->username + '@' + this->_clients[client_fd]->hostname + " PRIVMSG " + this->_clients[target_fd]->nickname + " " + message + "\r\n";
+		if (send(target_fd, message_cli.c_str(), message_cli.length(), 0) < 0)
 		{
 			std::cerr << RED << "SERVER: Error sending message to client" << RESET << std::endl;
 		}

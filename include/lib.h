@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 13:14:18 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 17:04:36 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/24 09:37:41 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,5 +39,7 @@
 # define BLUE    "\033[34m"
 # define GREEN   "\033[32m"
 # define RED     "\033[31m"
+
+# define SERVERNAME "IRC.42.fr"
 
 #endif
