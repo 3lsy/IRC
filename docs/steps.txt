@@ -5,3 +5,19 @@ Mi irc server solo va a hablar solo un idioma, irc3.2.
 CAP LS 302: Capabilities List version 3.2
 
 El cliente necesita enviar el usuario y password
+
+
+
+# TODO
+- [ ] Del Channels
+- [ ] PRIVMSG to unexistant user
+
+- [ ] KICK - Eject a client from the channel
+- [ ] INVITE - Invite a client to a channel
+- [ ] TOPIC - Change or view the channel topic
+- [ ] MODE - Change the channel’s mode:
+    · i: Set/remove Invite-only channel
+    · t: Set/remove the restrictions of the TOPIC command to channel operators
+    · k: Set/remove the channel key (password)
+    · o: Give/take channel operator privilege
+    · l: Set/remove the user limit to channel

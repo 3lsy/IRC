@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/11 19:47:39 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/24 11:07:46 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/24 11:15:30 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ void    IRC::_cmd_join(std::string channels, std::string passwords, int client_f
     {
         if (chans[i][0] != '#' && chans[i][0] != '&')
         {
-            std::cerr << RED << "SERVER: Error: Invalid channel name"<< chans[i] << RESET << std::endl;
+            std::cerr << RED << "SERVER: Error: Invalid channel name "<< chans[i] << RESET << std::endl;
             std::string errorMessage = ":" + std::string(SERVERNAME) + " 403 " + chans[i] + " :No such channel\r\n";
             if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
             {
