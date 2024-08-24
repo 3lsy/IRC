@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 18:12:53 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/24 09:59:34 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/24 12:22:08 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,23 @@ Channel& Channel::operator=(const Channel &other) {
 
 Channel::~Channel() {
 	// Destructor implementation
+}
+
+/**
+ * @brief Sends a message to all members of the channel
+ * 
+ * @param message The message to send
+ */
+void    Channel::_broadcast(std::string message)
+{
+    for (std::map<std::string, Client *>::iterator it = this->_members.begin(); it != this->_members.end(); it++)
+    {
+        if (send(it->second->fd, message.c_str(), message.length(), 0) < 0)
+        {
+            std::cerr << RED << "SERVER: Error sending message to client " << it->second->nickname << RESET << std::endl;
+        }
+    }
+    std::cout << BLUE << "SERVER: Broadcasting message to all members of " << this->_name << RESET << std::endl;
 }
 
 /**
@@ -143,16 +160,41 @@ bool Channel::join(Client *client, std::string password) {
  * @note Server format message: :<servername> 482 <channel> :You're not channel operator
  */
 void    Channel::change_topic(Client *client, std::string topic) {
+    if (this->_members.find(client->nickname) == this->_members.end())
+    {
+        std::cout << RED << "SERVER: " << client->nickname << " is not a member of " << this->_name << RESET << std::endl;
+        std::string message = ":" + std::string(SERVERNAME) + " 442 " + this->_name + " :You're not on that channel";
+        if (send(client->fd, message.c_str(), message.length(), 0) < 0)
+        {
+            std::cerr << RED << "SERVER: Error sending channel not found error message to client" << RESET << std::endl;
+        }
+        if (this->_operators.find(client->nickname) != this->_operators.end())
+            this->_operators.erase(client->nickname);
+        return ;
+    }
     if (this->topic_locked)
     {
         if (this->_operators.find(client->nickname) == this->_operators.end())
         {
+            std::cout << RED << "SERVER: " << client->nickname << " is not a channel operator" << RESET << std::endl;
             std::string message = ":" + std::string(SERVERNAME) + " 482 " + this->_name + " :You're not channel operator";
             send(client->fd, message.c_str(), message.length(), 0);
             return ;
         }
     }
     this->topic = topic;
+    std::string message = ":" + client->nickname + "!" + client->username + "@" + client->hostname + " TOPIC " + this->_name + " " + topic + "\r\n";
+    this->_broadcast(message);
+}
+
+void    Channel::get_topic(Client *client)
+{
+    std::cout << BLUE << "SERVER: TOPIC for " << this->_name << ": " << this->topic << RESET << std::endl;
+    std::string message = ":" + std::string(SERVERNAME) + " 332 " + client->nickname + " " + this->_name + " " + this->topic + "\r\n";
+    if (send(client->fd, message.c_str(), message.length(), 0) < 0)
+    {
+        std::cerr << RED << "SERVER: Error sending topic message to client" << RESET << std::endl;
+    }
 }
 
 // setters and getters

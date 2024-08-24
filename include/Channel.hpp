@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 17:33:12 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/18 22:53:27 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/24 12:09:36 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ class Channel {
 		bool					join(Client *client, std::string password);
 		void					send_message(std::string _channel_name, std::string message);
 		void					change_topic(Client *client, std::string topic);
+        void                    get_topic(Client *client);
 		// setters and getters
 		std::map<std::string, Client *> get_members(void);
 		std::map<std::string, Client *> get_operators(void);
