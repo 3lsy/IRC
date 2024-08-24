@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/11 18:27:01 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/18 21:45:32 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/24 09:57:43 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ std::vector<std::string>    split_by(const std::string& str, char delim)
  * @format: <CMD> <PARAMS> :<TRAILING>
  * 
  * @note Ignore unhandled commands (e.g. PING, PONG, CAP, etc.)
+ * @note Client welcome message: :<servername> 001 <nickname> :Welcome to the Internet Relay Network <nickname>!<username>@<hostname>
  */
 bool Client::login(std::string command)
 {
@@ -84,7 +85,7 @@ bool Client::login(std::string command)
 
     if (this->_password && this->nickname != "" && this->username != "" && this->realname != "")
     {
-        std::string welcomeMessage = ":server.hostname 001 " + this->nickname + " :Welcome to the Internet Relay Network " + this->nickname + "!" + this->username + "@" + this->hostname + "\r\n";
+        std::string welcomeMessage = ":" + std::string(SERVERNAME) + " 001 " + this->nickname + " :Welcome to the Internet Relay Network " + this->nickname + "!" + this->username + "@" + this->hostname + "\r\n";
         std::cout << BLUE << "SERVER: Sending welcome message to client: " << this->nickname << RESET << std::endl;
         if (send(this->fd, welcomeMessage.c_str(), welcomeMessage.length(), 0) < 0) {
             std::cerr << RED << "SERVER: Error sending welcome message to client" << RESET << std::endl;
@@ -110,7 +111,7 @@ bool	Client::_cmd_pass(std::string password)
 	else
 	{
 		std::cerr << RED << "SERVER: Password incorrect" << RESET << std::endl;
-		std::string errorMessage = ":server.hostname 464 * :Password incorrect\r\n";
+		std::string errorMessage = ":" + std::string(SERVERNAME) + " 464 * :Password incorrect\r\n";
         if (send(this->fd, errorMessage.c_str(), errorMessage.length(), 0) < 0) {
             std::cerr << RED << "SERVER: Error sending password error message to client" << RESET << std::endl;
         }
