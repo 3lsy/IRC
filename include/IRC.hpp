@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 13:16:01 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/24 12:14:13 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/24 13:19:38 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,8 @@ private:
 	void				_cmd_privmsg(std::string target, std::string message, int client_fd);
     void                _cmd_topic(std::string channel, std::string topic, int client_fd);
     void                _cmd_topic(std::string channel, int client_fd);
+    void                _cmd_mode(std::string channel, std::string mode, int client_fd);
+    void                _cmd_mode(std::string channel, std::string mode, std::string arg, int client_fd);
 	//send messages methods
 	void				_send_to_channel(int client_fd, Channel *channel, std::string message);
 	void				_send_to_client(int client_fd, int target_fd, std::string message);

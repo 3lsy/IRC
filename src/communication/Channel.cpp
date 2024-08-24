@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 18:12:53 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/24 12:22:08 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/24 14:00:35 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,15 +17,15 @@ Channel::Channel() {
 	// Constructor implementation
 }
 
-Channel::Channel(std::string name, std::string password): invite_only(false), topic_locked(false), key_password(true), user_limit(0),
+Channel::Channel(std::string name, std::string password, Client *client): invite_only(false), topic_locked(true), key_password(true), user_limit(0),
     _name(name), _password(password)
 {
-    // Constructor implementation
+    this->_add_operator(client);
 }
 
-Channel::Channel(std::string name): invite_only(false), topic_locked(false), key_password(false), user_limit(0), _name(name), _password("")
+Channel::Channel(std::string name, Client *client): invite_only(false), topic_locked(true), key_password(false), user_limit(0), _name(name), _password("")
 {
-    // Constructor implementation
+    this->_add_operator(client);
 }
 
 Channel::Channel(const Channel &other) {
@@ -39,6 +39,17 @@ Channel& Channel::operator=(const Channel &other) {
 
 Channel::~Channel() {
 	// Destructor implementation
+}
+
+/**
+ * @brief Add operator to the channel
+ * 
+ * @param client The client to add as operator
+ */
+void    Channel::_add_operator(Client *client)
+{
+    this->_operators[client->nickname] = client;
+    std::cout << BLUE << "SERVER: " << client->nickname << " is now an operator of " << this->_name << RESET << std::endl;
 }
 
 /**
@@ -194,6 +205,101 @@ void    Channel::get_topic(Client *client)
     if (send(client->fd, message.c_str(), message.length(), 0) < 0)
     {
         std::cerr << RED << "SERVER: Error sending topic message to client" << RESET << std::endl;
+    }
+}
+
+/**
+ * @brief Changes the mode of the channel
+ * 
+ * @param client The client changing the mode
+ * @param mode The mode to change
+ * 
+ * @note Client format message: :<nickname
+ * @note Server format message: :<servername> 482 <channel> :You're not channel operator
+ */
+void    Channel::change_mode(Client *client, std::string mode)
+{
+    // Check if the client is an operator
+    if (this->_operators.find(client->nickname) == this->_operators.end())
+    {
+        std::cout << RED << "SERVER: " << client->nickname << " is not a channel operator" << RESET << std::endl;
+        std::string message = ":" + std::string(SERVERNAME) + " 482 " + this->_name + " :You're not channel operator\r\n";
+        if (send(client->fd, message.c_str(), message.length(), 0) < 0)
+        {
+            std::cerr << RED << "SERVER: Error sending channel not found error message to client" << RESET << std::endl;
+        }
+        return ;
+    }
+    if (mode[0] == '+')
+    {
+        if (mode[1] == 'i')
+            this->invite_only = true;
+        else if (mode[1] == 't')
+            this->topic_locked = true;
+    }
+    else if (mode[0] == '-')
+    {
+        if (mode[1] == 'i')
+            this->invite_only = false;
+        else if (mode[1] == 't')
+            this->topic_locked = false;
+    }
+}
+
+/**
+ * @brief Changes the mode of the channel
+ * 
+ * @param client The client changing the mode
+ * @param mode The mode to change
+ * @param arg The argument for the mode
+ * 
+ * @note Client format message: :<nickname
+ * @note Server format message: :<servername> 482 <channel> :You're not channel operator
+ */
+void    Channel::change_mode(Client *client, std::string mode, std::string arg)
+{
+    if (this->_operators.find(client->nickname) == this->_operators.end())
+    {
+        std::cout << RED << "SERVER: " << client->nickname << " is not a channel operator" << RESET << std::endl;
+        std::string message = ":" + std::string(SERVERNAME) + " 482 " + this->_name + " :You're not channel operator";
+        if (send(client->fd, message.c_str(), message.length(), 0) < 0)
+        {
+            std::cerr << RED << "SERVER: Error sending channel not found error message to client" << RESET << std::endl;
+        }
+        return ;
+    }
+    if (mode[0] == '+')
+    {
+        if (mode[1] == 'k')
+        {
+            this->key_password = true;
+            this->_password = arg;
+        }
+        else if (mode[1] == 'l')
+        {
+            int limit = std::atoi(arg.c_str());
+            if (arg.empty() || (limit == 0 && arg != "0"))
+            {
+                std::cerr << RED << "SERVER: Error: Invalid number format" << RESET << std::endl;
+                std::string message = ":" + std::string(SERVERNAME) + " 461 " + _name + " :Not enough parameters";
+                if (send(client->fd, message.c_str(), message.length(), 0) < 0)
+                    std::cerr << RED << "SERVER: Error sending channel not found error message to client" << RESET << std::endl;
+            }
+            else
+                user_limit = limit;
+        }
+    }
+    else if (mode[0] == '-')
+    {
+        if (mode[1] == 'k')
+        {
+            this->key_password = false;
+            this->_password = "";
+        }
+        else if (mode[1] == 'l')
+        {
+            this->user_limit = 0;
+        }
     }
 }
 

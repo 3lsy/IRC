@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/11 19:47:39 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/24 12:22:38 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/24 13:58:13 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,15 @@ void    IRC::_interaction(std::string command, int client_fd)
         else
             return ;
     }
+    else if (cmd[0] == "MODE")
+    {
+        if (cmd.size() == 3)
+            this->_cmd_mode(cmd[1], cmd[2], client_fd);
+        else if (cmd.size() == 4)
+            this->_cmd_mode(cmd[1], cmd[2], cmd[3], client_fd);
+        else
+            return ;
+    }
     else if (cmd[0] == "PING")
     {
         std::string pong = "PONG " + std::string(SERVERNAME) + "\r\n";
@@ -110,12 +119,12 @@ void    IRC::_cmd_join(std::string channels, std::string passwords, int client_f
             // Channel does not exist, create it
             if (pass.size() <= i)
             {
-                Channel *new_channel = new Channel(chans[i]);
+                Channel *new_channel = new Channel(chans[i], this->_clients[client_fd]);
                 this->_channels[chans[i]] = new_channel;
             }
             else
             {
-                Channel *new_channel = new Channel(chans[i], pass[i]);
+                Channel *new_channel = new Channel(chans[i], pass[i], this->_clients[client_fd]);
                 this->_channels[chans[i]] = new_channel;
             }
         }
@@ -251,6 +260,57 @@ void    IRC::_cmd_topic(std::string channel, int client_fd)
     {
         std::cerr << RED << "SERVER: Error: No such channel: " << channel << RESET << std::endl;
         std::string errorMessage = ":" + std::string(SERVERNAME) + " 403 " + channel + " :No such channel\r\n";
+        if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
+        {
+            std::cerr << RED << "SERVER: Error sending channel not found error message to client" << RESET << std::endl;
+        }
+    }
+}
+
+
+/**
+ * @brief Handles the mode process for the client
+ * 
+ * @param target The target of the mode change
+ * @param mode The mode to change
+ * @param client_fd The file descriptor of the client
+ * 
+ * @note Client format message: :<nickname>!<username>@<hostname> MODE <target> <mode>
+ * @note Server format message: :<servername> 482 <target> :You're not channel operator
+ */
+void    IRC::_cmd_mode(std::string target, std::string mode, int client_fd)
+{
+    if (this->_channels.find(target) != this->_channels.end())
+        this->_channels[target]->change_mode(this->_clients[client_fd], mode);
+    else
+    {
+        std::cerr << RED << "SERVER: Error: No such channel: " << target << RESET << std::endl;
+        std::string errorMessage = ":" + std::string(SERVERNAME) + " 403 " + target + " :No such channel\r\n";
+        if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
+        {
+            std::cerr << RED << "SERVER: Error sending channel not found error message to client" << RESET << std::endl;
+        }
+    }
+}
+
+/**
+ * @brief Handles the mode process for the client
+ * 
+ * @param target The target of the mode change
+ * @param mode The mode to change
+ * @param client_fd The file descriptor of the client
+ * 
+ * @note Client format message: :<nickname>!<username>@<hostname> MODE <target> <mode>
+ * @note Server format message: :<servername> 482 <target> :You're not channel operator
+ */
+void    IRC::_cmd_mode(std::string target, std::string mode, std::string arg, int client_fd)
+{
+    if (this->_channels.find(target) != this->_channels.end())
+        this->_channels[target]->change_mode(this->_clients[client_fd], mode, arg);
+    else
+    {
+        std::cerr << RED << "SERVER: Error: No such channel: " << target << RESET << std::endl;
+        std::string errorMessage = ":" + std::string(SERVERNAME) + " 403 " + target + " :No such channel\r\n";
         if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
         {
             std::cerr << RED << "SERVER: Error sending channel not found error message to client" << RESET << std::endl;
