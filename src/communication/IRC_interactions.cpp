@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/11 19:47:39 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/24 13:47:33 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/24 13:52:29 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,18 @@ void    IRC::_interaction(std::string command, int client_fd)
 		else
 			return ;	
 	}
+    else if (cmd[0] == "TOPIC")
+    {
+        if (cmd.size() >= 3)
+        {
+            std::string topic = command.substr(command.find(cmd[2]));
+            this->_cmd_topic(cmd[1], topic, client_fd);
+        }
+        else if (cmd.size() == 2)
+            this->_cmd_topic(cmd[1], client_fd);
+        else
+            return ;
+    }
     else if (cmd[0] == "PING")
     {
         std::string pong = "PONG " + std::string(SERVERNAME) + "\r\n";
@@ -285,3 +297,42 @@ void    IRC::_cmd_invite(std::string nickname, std::string channel, int client_f
 	}
 }
 
+/**
+ * @brief Handles the topic process for the client
+ * 
+ * @param channel The channel to change the topic
+ * @param topic The new topic
+ * @param client_fd The file descriptor of the client
+ * 
+ * @note Client format message: :<nickname>!<username>@<hostname> TOPIC <channel> :<topic>
+ * @note Server format message: :<servername> 482 <channel> :You're not channel operator
+ */
+void    IRC::_cmd_topic(std::string channel, std::string topic, int client_fd)
+{
+    if (this->_channels.find(channel) != this->_channels.end())
+        this->_channels[channel]->change_topic(this->_clients[client_fd], topic);
+    else
+    {
+        std::cerr << RED << "SERVER: Error: No such channel: " << channel << RESET << std::endl;
+        std::string errorMessage = ":" + std::string(SERVERNAME) + " 403 " + channel + " :No such channel\r\n";
+        if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
+        {
+            std::cerr << RED << "SERVER: Error sending channel not found error message to client" << RESET << std::endl;
+        }
+    }
+}
+
+void    IRC::_cmd_topic(std::string channel, int client_fd)
+{
+    if (this->_channels.find(channel) != this->_channels.end())
+        this->_channels[channel]->get_topic(this->_clients[client_fd]);
+    else
+    {
+        std::cerr << RED << "SERVER: Error: No such channel: " << channel << RESET << std::endl;
+        std::string errorMessage = ":" + std::string(SERVERNAME) + " 403 " + channel + " :No such channel\r\n";
+        if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
+        {
+            std::cerr << RED << "SERVER: Error sending channel not found error message to client" << RESET << std::endl;
+        }
+    }
+}
