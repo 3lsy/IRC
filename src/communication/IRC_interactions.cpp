@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/11 19:47:39 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/24 10:27:19 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/24 10:44:12 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,16 @@ void    IRC::_interaction(std::string command, int client_fd)
 		else
 			return ;
 	}
+    else if (cmd[0] == "PING")
+    {
+        std::string pong = "PONG " + std::string(SERVERNAME) + "\r\n";
+        std::cout << BLUE << "SERVER: PING received from client" << RESET << std::endl;
+        if (send(client_fd, pong.c_str(), pong.length(), 0) < 0)
+        {
+            std::cerr << RED << "SERVER: Error sending PONG message to client" << RESET << std::endl;
+        }
+        std::cout << BLUE << "SERVER: PONG sent to client" << RESET << std::endl;
+    }
 }
 
 /**
