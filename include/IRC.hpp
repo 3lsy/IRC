@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 13:16:01 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/18 21:33:56 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/24 12:08:09 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ private:
     void                _interaction(std::string command, int fd);
     void                _cmd_join(std::string channels, std::string passwords, int client_fd);
 	void				_cmd_privmsg(std::string target, std::string message, int client_fd);
+	void				_cmd_invite(std::string nickname, std::string channel, int client_fd);
 	//send messages methods
 	void				_send_to_channel(int client_fd, Channel *channel, std::string message);
 	void				_send_to_client(int client_fd, int target_fd, std::string message);

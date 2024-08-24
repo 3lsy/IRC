@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 18:12:53 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/24 09:59:34 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/24 13:49:38 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,4 +170,8 @@ std::map<std::string, Client *> Channel::get_invited(void) {
 
 std::string Channel::get_name(void) {
 	return (this->_name);
+}
+
+bool Channel::get_invite_only(void) {
+	return (this->invite_only);
 }
