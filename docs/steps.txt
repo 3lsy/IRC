@@ -24,3 +24,5 @@ El cliente necesita enviar el usuario y password
     · k: Set/remove the channel key (password)
     · o: Give/take channel operator privilege
     · l: Set/remove the user limit to channel
+
+- When kicking a user out of a channel, add them to the "kicked" list and then when they try to join again they cant

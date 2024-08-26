@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 18:12:53 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/24 14:04:05 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/26 12:34:38 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -322,4 +322,13 @@ std::string Channel::get_name(void) {
 
 bool Channel::get_invite_only(void) {
 	return (this->invite_only);
+}
+
+void Channel::remove_member(std::string nickname) {
+    std::map<std::string, Client *>::iterator it = _members.find(nickname);
+    if (it != _members.end()) {
+        _members.erase(it);
+		_operators.erase(nickname);
+        std::cout << "Removed " << nickname << " from channel " << _name << std::endl;
+    }
 }

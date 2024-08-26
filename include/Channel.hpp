@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 17:33:12 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/24 14:04:10 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/08/26 12:18:31 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ class Channel {
         void                    get_topic(Client *client);
         void					change_mode(Client *client, std::string mode);
         void					change_mode(Client *client, std::string mode, std::string arg);
+		void					remove_member(std::string nickname);
 		// setters and getters
 		std::map<std::string, Client *> get_members(void);
 		std::map<std::string, Client *> get_operators(void);
