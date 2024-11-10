@@ -1,0 +1,28 @@
+/nick
+- Sometimes I can have the same nickname in the server at the same time
+	[Solved]
+
+/username
+
+/password
+
+/join
+
+/msg
+
+Channel operators actions:
+
+/kick
+
+/invite
+
+/topic
+- a non operator can view the topic (/topic), but at least it cant change it
+
+/mode i
+
+/mode t
+
+/mode k
+
+/mode o

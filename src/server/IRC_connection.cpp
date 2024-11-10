@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 10:28:08 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/24 09:59:19 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/11/10 18:09:09 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void    IRC::_read_client_message(int fd)
             {
                 std::cerr << RED << "SERVER: Error sending nickname error message to client" << RESET << std::endl;
             }
-            this->remove_client(fd);
+            this->remove_client(fd, false);
             return ;
         }
         else if (this->_clients[fd]->logged_in)
@@ -104,10 +104,10 @@ void	IRC::_read_from_client(int fd)
  * 
  * @param fd The file descriptor of the client to remove
  */
-void IRC::remove_client(int fd)
+void IRC::remove_client(int fd, bool remove_nickname)
 {
     // if nickname in map, erase it
-    if (this->_nicknames.find(this->_clients[fd]->nickname) != this->_nicknames.end())
+    if (remove_nickname && this->_nicknames.find(this->_clients[fd]->nickname) != this->_nicknames.end())
         this->_nicknames.erase(this->_clients[fd]->nickname);
     // Find the client in the map
     std::map<int, Client *>::iterator it = this->_clients.find(fd);

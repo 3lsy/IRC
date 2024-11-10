@@ -6,13 +6,44 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/11 19:47:39 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/26 12:18:44 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/11/10 19:17:49 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "IRC.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
+
+/**
+ * @brief Prints an error message to the client
+ * 
+ * @param context The context of the error
+ * @param message The message to print
+ * @param client_fd The file descriptor of the client
+ */
+void IRC::_print_error(const std::string &context, const std::string &errorMessage, int client_fd) const
+{
+    std::cerr << RED << "SERVER: Error: " << context << ": " << errorMessage << RESET << std::endl;
+    if (client_fd != -1)
+    {
+        if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
+        {
+            std::cerr << RED << "SERVER: Error sending error message to client" << RESET << std::endl;
+        }
+    }
+}
+
+void IRC::_print_message(const std::string &context, const std::string &message, int client_fd) const
+{
+	std::cout << BLUE << "SERVER: " << context << ": " << message << RESET << std::endl;
+	if (client_fd != -1)
+	{
+		if (send(client_fd, message.c_str(), message.length(), 0) < 0)
+		{
+			std::cerr << RED << "SERVER: Error sending message to client" << RESET << std::endl;
+		}
+	}
+}
 
 /**
  * @brief Handles the action process for the client
@@ -119,6 +150,7 @@ void    IRC::_cmd_join(std::string channels, std::string passwords, int client_f
 {
     std::vector<std::string> chans = split_by(channels, ',');
     std::vector<std::string> pass = split_by(passwords, ',');
+	
 	if (pass.size() > 0 && chans.size() != pass.size())
 		return ;
     // Check channel names contain # or & at the beginning
@@ -126,13 +158,8 @@ void    IRC::_cmd_join(std::string channels, std::string passwords, int client_f
     {
         if (chans[i][0] != '#' && chans[i][0] != '&')
         {
-            std::cerr << RED << "SERVER: Error: Invalid channel name "<< chans[i] << RESET << std::endl;
-            std::string errorMessage = ":" + std::string(SERVERNAME) + " 403 " + chans[i] + " :No such channel\r\n";
-            if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
-            {
-                std::cerr << RED << "SERVER: Error sending channel not found error message to client" << RESET << std::endl;
-            }
-            return ;
+			_print_error("Invalid channel name", ":" + std::string(SERVERNAME) + " 403 " + chans[i] + " :No such channel\r\n", client_fd);
+			return ;
         }
     }
     for (size_t i = 0; i < chans.size(); i++)
@@ -177,30 +204,29 @@ void    IRC::_cmd_privmsg(std::string target, std::string message, int client_fd
 			this->_send_to_channel(client_fd, this->_channels[target], message);
 		}
 		else {
-			std::cerr << RED << "SERVER: Error: No such channel: " << target << RESET << std::endl;
-			std::string errorMessage = ":" + std::string(SERVERNAME) + " 403 " + this->_clients[client_fd]->nickname + target + " :No such channel\r\n";
-			if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
-			{
-				std::cerr << RED << "SERVER: Error sending <channel not found> error message to client" << RESET << std::endl;
-			}
+			_print_error("No such channel", ":" + std::string(SERVERNAME) + " 403 " + this->_clients[client_fd]->nickname + target + " :No such channel\r\n", client_fd);
 		}
 	}
 	else
 	{
-		if (this->_clients.find(this->_nicknames[target]) != this->_clients.end()) {
+		if (this->_find_user_by_nickname(target)) {
             std::cout << BLUE << "SERVER: Sending message to " << target << RESET << std::endl;
 			this->_send_to_client(client_fd, this->_nicknames[target], message);
 		}
 		else {
-			std::cerr << RED << "SERVER: Error: No such client: " << target << RESET << std::endl;
-			std::string errorMessage = ":" + std::string(SERVERNAME) + " 401 " + this->_clients[client_fd]->nickname + " " + target + " :No such client\r\n";
-            std::cout << errorMessage << std::endl;
-			if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
-			{
-				std::cerr << RED << "SERVER: Error sending <client not found> error message to client" << RESET << std::endl;
-			}
+			_print_error("No such client", ":" + std::string(SERVERNAME) + " 401 " + this->_clients[client_fd]->nickname + " " + target + " :No such client\r\n", client_fd);
 		}
 	}
+}
+
+/*
+find the user by nickname, bool function
+*/
+bool IRC::_find_user_by_nickname(std::string nickname)
+{
+	if (this->_nicknames.find(nickname) != this->_nicknames.end())
+		return true;
+	return false;
 }
 
 /**
@@ -220,12 +246,7 @@ void	IRC::_send_to_channel(int client_fd, Channel *channel, std::string message)
 	{
 		if (FD_ISSET(it->second->fd, &this->_write_set))// && it->second->fd != client_fd) // to debug, this returns the message to the sender too
 		{
-			std::cout << BLUE << "SERVER: Sending message to " << it->second->nickname << RESET << std::endl;
-			std::string message_cli = ":" + this->_clients[client_fd]->nickname + '!' + this->_clients[client_fd]->username + '@' + this->_clients[client_fd]->hostname + " PRIVMSG " + channel->get_name() + " " + message + "\r\n";
-			if (send(it->second->fd, message_cli.c_str(), message_cli.length(), 0) < 0)
-			{
-				std::cerr << RED << "SERVER: Error sending message to client" << RESET << std::endl;
-			}
+			_print_message("Sending message to " + it->second->nickname, ":" + this->_clients[client_fd]->nickname + '!' + this->_clients[client_fd]->username + '@' + this->_clients[client_fd]->hostname + " PRIVMSG " + channel->get_name() + " " + message + "\r\n", it->second->fd);
 		}
 	}
 }
@@ -242,11 +263,7 @@ void	IRC::_send_to_channel(int client_fd, Channel *channel, std::string message)
 void	IRC::_send_to_client(int client_fd, int target_fd, std::string message) {
 	if (FD_ISSET(target_fd, &this->_write_set))// && target_fd != client_fd) // for testing purposes, this returns the message to the sender too
 	{
-        std::string message_cli = ":" + this->_clients[client_fd]->nickname + '!' + this->_clients[client_fd]->username + '@' + this->_clients[client_fd]->hostname + " PRIVMSG " + this->_clients[target_fd]->nickname + " " + message + "\r\n";
-		if (send(target_fd, message_cli.c_str(), message_cli.length(), 0) < 0)
-		{
-			std::cerr << RED << "SERVER: Error sending message to client" << RESET << std::endl;
-		}
+		_print_message("Sending message to " + this->_clients[target_fd]->nickname, ":" + this->_clients[client_fd]->nickname + '!' + this->_clients[client_fd]->username + '@' + this->_clients[client_fd]->hostname + " PRIVMSG " + this->_clients[target_fd]->nickname + " " + message + "\r\n", target_fd);
 	}
 }
 
@@ -260,25 +277,17 @@ void	IRC::_send_to_client(int client_fd, int target_fd, std::string message) {
  * @note Client format message: :<nickname>!<username>@<hostname> INVITE <nickname> <channel>
  */
 void    IRC::_cmd_invite(std::string nickname, std::string channel, int client_fd) {
+	std::map<std::string, Client *> members = this->_channels[channel]->get_members();
+	std::map<std::string, Client *> operators = this->_channels[channel]->get_operators();
 	//check if nickname and channel exists
 	if (this->_nicknames.find(nickname) == this->_nicknames.end())
 	{
-		std::cerr << RED << "SERVER: Error: No such nickname: " << nickname << RESET << std::endl;
-		std::string errorMessage = ":" + std::string(SERVERNAME) + " 401 " + this->_clients[client_fd]->nickname + " " + nickname + " :No such nickname\r\n";
-		if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
-		{
-			std::cerr << RED << "SERVER: Error sending <nickname not found> error message to client" << RESET << std::endl;
-		}
+		_print_error("No such nickname", ":" + std::string(SERVERNAME) + " 401 " + this->_clients[client_fd]->nickname + " " + nickname + " :No such nickname\r\n", client_fd);
 		return ;
 	}
 	else if (this->_channels.find(channel) == this->_channels.end())
 	{
-		std::cerr << RED << "SERVER: Error: No such channel: " << channel << RESET << std::endl;
-		std::string errorMessage = ":" + std::string(SERVERNAME) + " 403 " + this->_clients[client_fd]->nickname + " " + channel + " :No such channel\r\n";
-		if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
-		{
-			std::cerr << RED << "SERVER: Error sending <channel not found> error message to client" << RESET << std::endl;
-		}
+		_print_error("No such channel", ":" + std::string(SERVERNAME) + " 403 " + this->_clients[client_fd]->nickname + " " + channel + " :No such channel\r\n", client_fd);
 		return ;
 	}
 	//check if channel is invite only
@@ -287,18 +296,13 @@ void    IRC::_cmd_invite(std::string nickname, std::string channel, int client_f
 		return ;
 	}
 	//check if nickname is already in channel
-	else if (this->_channels[channel]->get_members().find(nickname) != this->_channels[channel]->get_members().end())
+	else if (members.find(nickname) != members.end())
 	{
-		std::cerr << RED << "SERVER: Error: " << nickname << " is already on" << channel << RESET << std::endl;
-		std::string errorMessage = ":" + std::string(SERVERNAME) + " 443 " + this->_clients[client_fd]->nickname + " " + nickname + " " + channel + " :is already on channel\r\n";
-		if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
-		{
-			std::cerr << RED << "SERVER: Error sending <already in channel> error message to client" << RESET << std::endl;
-		}
+		_print_error("Already in channel", ":" + std::string(SERVERNAME) + " 443 " + this->_clients[client_fd]->nickname + " " + nickname + " " + channel + " :is already on channel\r\n", client_fd);
 		return ;
 	}
 	//check if client trying to invite nickname is IN channel
-	// else if (this->_channels[channel]->get_members().find(this->_clients[client_fd]->nickname) == this->_channels[channel]->get_members().end())
+	// else if (members.find(this->_clients[client_fd]->nickname) == members.end())
 	// {
 	// 	std::cerr << RED << "SERVER: Error: " << this->_clients[client_fd]->nickname << " is not in " << channel << RESET << std::endl;
 	// 	std::string errorMessage = ":" + std::string(SERVERNAME) + " 442 " + this->_clients[client_fd]->nickname + " " + channel + " :You're not on that channel\r\n";
@@ -309,26 +313,17 @@ void    IRC::_cmd_invite(std::string nickname, std::string channel, int client_f
 	// 	return ;
 	// }
 	//check if channel is in invite mode only and the user is not a channel operator
-	else if (this->_channels[channel]->get_invite_only() && (this->_channels[channel]->get_operators().find(this->_clients[client_fd]->nickname) == this->_channels[channel]->get_operators().end()))
+	else if (this->_channels[channel]->get_invite_only() && (operators.find(this->_clients[client_fd]->nickname) == operators.end()))
 	{
-		std::cerr << RED << "SERVER: Error: " << this->_clients[client_fd]->nickname << " is not a channel operator in " << channel << RESET << std::endl;
-		std::string errorMessage = ":" + std::string(SERVERNAME) + " 482 " + channel + " :You're not channel operator\r\n";
-		if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
-		{
-			std::cerr << RED << "SERVER: Error sending <not channel operator> error message to client" << RESET << std::endl;
-		}
+		_print_error("Not channel operator", ":" + std::string(SERVERNAME) + " 482 " + channel + " :You're not channel operator\r\n", client_fd);
 		return ;
 	}
 	//send invite message
 	else
 	{
-		std::string message = ":" + this->_clients[client_fd]->nickname + " INVITE " + nickname + " " + channel + "\r\n";
+		_print_message("Sending invite to " + nickname, ":" + this->_clients[client_fd]->nickname + " INVITE " + nickname + " " + channel + "\r\n", client_fd);
 		//add to invited list
 		this->_channels[channel]->get_invited()[nickname] = this->_clients[this->_nicknames[nickname]];
-		if (send(this->_nicknames[nickname], message.c_str(), message.length(), 0) < 0)
-		{
-			std::cerr << RED << "SERVER: Error sending invite message to client" << RESET << std::endl;
-		}
 	}
 }
 
@@ -341,47 +336,30 @@ void    IRC::_cmd_invite(std::string nickname, std::string channel, int client_f
  */
 void    IRC::_cmd_kick(std::string channel, std::string nickname, std::string comment, int client_fd)
 {
+	std::map<std::string, Client *> members = this->_channels[channel]->get_members();
+	std::map<std::string, Client *> operators = this->_channels[channel]->get_operators();
+
 	//check if nickname and channel exists
 	if (this->_nicknames.find(nickname) == this->_nicknames.end())
 	{
-		std::cerr << RED << "SERVER: Error: No such nickname: " << nickname << RESET << std::endl;
-		std::string errorMessage = ":" + std::string(SERVERNAME) + " 401 " + this->_clients[client_fd]->nickname + " " + nickname + " :No such nickname\r\n";
-		if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
-		{
-			std::cerr << RED << "SERVER: Error sending <nickname not found> error message to client" << RESET << std::endl;
-		}
+		_print_error("No such nickname", ":" + std::string(SERVERNAME) + " 401 " + this->_clients[client_fd]->nickname + " " + nickname + " :No such nickname\r\n", client_fd);
 		return ;
 	}
 	else if (this->_channels.find(channel) == this->_channels.end())
 	{
-		std::cerr << RED << "SERVER: Error: No such channel: " << channel << RESET << std::endl;
-		std::string errorMessage = ":" + std::string(SERVERNAME) + " 403 " + this->_clients[client_fd]->nickname + " " + channel + " :No such channel\r\n";
-		if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
-		{
-			std::cerr << RED << "SERVER: Error sending <channel not found> error message to client" << RESET << std::endl;
-		}
+		_print_error("No such channel", ":" + std::string(SERVERNAME) + " 403 " + this->_clients[client_fd]->nickname + " " + channel + " :No such channel\r\n", client_fd);
 		return ;
 	}
 	//check if nickname is not in channel
-	else if (this->_channels[channel]->get_members().find(nickname) == this->_channels[channel]->get_members().end())
+	else if (members.find(nickname) == members.end())
 	{
-		std::cerr << RED << "SERVER: Error: " << nickname << " is not in " << channel << RESET << std::endl;
-		std::string errorMessage = ":" + std::string(SERVERNAME) + " 441 " + this->_clients[client_fd]->nickname + " " + nickname + " " + channel + " :They aren't on that channel\r\n";
-		if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
-		{
-			std::cerr << RED << "SERVER: Error sending <not in channel> error message to client" << RESET << std::endl;
-		}
+		_print_error("Not in channel", ":" + std::string(SERVERNAME) + " 441 " + this->_clients[client_fd]->nickname + " " + nickname + " " + channel + " :They aren't on that channel\r\n", client_fd);
 		return ;
 	}
 	// check if client_fd is operator
-	else if (this->_channels[channel]->get_operators().find(this->_clients[client_fd]->nickname) == this->_channels[channel]->get_operators().end())
+	else if (operators.find(this->_clients[client_fd]->nickname) == operators.end())
 	{
-		std::cerr << RED << "SERVER: Error: " << this->_clients[client_fd]->nickname << " is not a channel operator in " << channel << RESET << std::endl;
-		std::string errorMessage = ":" + std::string(SERVERNAME) + " 482 " + channel + " :You're not channel operator\r\n";
-		if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
-		{
-			std::cerr << RED << "SERVER: Error sending <not channel operator> error message to client" << RESET << std::endl;
-		}
+		_print_error("Not channel operator", ":" + std::string(SERVERNAME) + " 482 " + channel + " :You're not channel operator\r\n", client_fd);
 		return ;
 	}
 	std::string kick_comment = comment.empty() ? "You have been kicked from the channel" : comment;
@@ -410,12 +388,7 @@ void    IRC::_cmd_topic(std::string channel, std::string topic, int client_fd)
         this->_channels[channel]->change_topic(this->_clients[client_fd], topic);
     else
     {
-        std::cerr << RED << "SERVER: Error: No such channel: " << channel << RESET << std::endl;
-        std::string errorMessage = ":" + std::string(SERVERNAME) + " 403 " + channel + " :No such channel\r\n";
-        if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
-        {
-            std::cerr << RED << "SERVER: Error sending channel not found error message to client" << RESET << std::endl;
-        }
+		_print_error("No such channel", ":" + std::string(SERVERNAME) + " 403 " + channel + " :No such channel\r\n", client_fd);
     }
 }
 
@@ -425,12 +398,7 @@ void    IRC::_cmd_topic(std::string channel, int client_fd)
         this->_channels[channel]->get_topic(this->_clients[client_fd]);
     else
     {
-        std::cerr << RED << "SERVER: Error: No such channel: " << channel << RESET << std::endl;
-        std::string errorMessage = ":" + std::string(SERVERNAME) + " 403 " + channel + " :No such channel\r\n";
-        if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
-        {
-            std::cerr << RED << "SERVER: Error sending channel not found error message to client" << RESET << std::endl;
-        }
+		_print_error("No such channel", ":" + std::string(SERVERNAME) + " 403 " + channel + " :No such channel\r\n", client_fd);
     }
 }
 
@@ -451,12 +419,7 @@ void    IRC::_cmd_mode(std::string target, std::string mode, int client_fd)
         this->_channels[target]->change_mode(this->_clients[client_fd], mode);
     else
     {
-        std::cerr << RED << "SERVER: Error: No such channel: " << target << RESET << std::endl;
-        std::string errorMessage = ":" + std::string(SERVERNAME) + " 403 " + target + " :No such channel\r\n";
-        if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
-        {
-            std::cerr << RED << "SERVER: Error sending channel not found error message to client" << RESET << std::endl;
-        }
+		_print_error("No such channel", ":" + std::string(SERVERNAME) + " 403 " + target + " :No such channel\r\n", client_fd);
     }
 }
 
@@ -476,11 +439,6 @@ void    IRC::_cmd_mode(std::string target, std::string mode, std::string arg, in
         this->_channels[target]->change_mode(this->_clients[client_fd], mode, arg);
     else
     {
-        std::cerr << RED << "SERVER: Error: No such channel: " << target << RESET << std::endl;
-        std::string errorMessage = ":" + std::string(SERVERNAME) + " 403 " + target + " :No such channel\r\n";
-        if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
-        {
-            std::cerr << RED << "SERVER: Error sending channel not found error message to client" << RESET << std::endl;
-        }
+		_print_error("No such channel", ":" + std::string(SERVERNAME) + " 403 " + target + " :No such channel\r\n", client_fd);
     }
 }

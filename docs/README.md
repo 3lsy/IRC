@@ -24,6 +24,7 @@ We chose [WeeChat](https://weechat.org/) as client, even though we followed the 
 
 ```bash
 /server add my_irc localhost/6667 -password=MYSECUREPASSWORD
+/server add my_irc localhost/6667 -password=password
 ```
 
 > [!NOTE]

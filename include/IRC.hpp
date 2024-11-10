@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 13:16:01 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/26 11:50:12 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/11/10 18:43:18 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,8 @@ private:
 	void				_read_from_client(int fd);
 	void				_read_client_message(int fd);
     //command handler for communication (PRIVMSG, JOIN, PART, etc)
+	void				_print_error(const std::string &context, const std::string &errorMessage, int client_fd = -1) const;
+	void				_print_message(const std::string &context, const std::string &message, int client_fd = -1) const;
     void                _interaction(std::string command, int fd);
     void                _cmd_join(std::string channels, std::string passwords, int client_fd);
 	void				_cmd_privmsg(std::string target, std::string message, int client_fd);
@@ -58,6 +60,8 @@ private:
     void                _cmd_topic(std::string channel, int client_fd);
     void                _cmd_mode(std::string channel, std::string mode, int client_fd);
     void                _cmd_mode(std::string channel, std::string mode, std::string arg, int client_fd);
+	//find methods
+	bool				_find_user_by_nickname(std::string nickname);
 	//send messages methods
 	void				_send_to_channel(int client_fd, Channel *channel, std::string message);
 	void				_send_to_client(int client_fd, int target_fd, std::string message);
@@ -76,7 +80,7 @@ public:
 	// Server control methods
 	void				stop_server(void);
 	void				serve();
-	void				remove_client(int fd);
+	void				remove_client(int fd, bool remove_nickname = true);
 	// Static methods
 	static bool			valid_port(int port);
 	static void			signal_handler(int signum);
