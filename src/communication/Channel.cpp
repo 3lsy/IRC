@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 18:12:53 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/26 12:34:38 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/11/10 21:33:53 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,8 +85,7 @@ bool Channel::join(Client *client) {
     // if channel is password protected, check if client has password
     if (this->key_password)
     {
-        std::string message = ":" + std::string(SERVERNAME) + " 475 " + this->_name + " :Cannot join channel (+k)";
-        send(client->fd, message.c_str(), message.length(), 0);
+		_print_error("Cannot join channel (+k)", ":" + std::string(SERVERNAME) + " 475 " + this->_name + " :Cannot join channel (+k)\r\n", client->fd);
         return (false);
     }
     // if channel is invite only, check if client is invited
@@ -95,23 +94,19 @@ bool Channel::join(Client *client) {
         // Check that the client nick is in the _invited list
         if (this->_invited.find(client->nickname) == this->_invited.end())
         {
-            std::string message = ":" + std::string(SERVERNAME) + " 473 " + this->_name + " :Cannot join channel (+i)";
-            send(client->fd, message.c_str(), message.length(), 0);
+			_print_error("Cannot join channel (+i)", ":" + std::string(SERVERNAME) + " 473 " + this->_name + " :Cannot join channel (+i)\r\n", client->fd);
             return (false);
         }
     }
     // if channel is full (user_limit), reject client
     if (this->user_limit > 0 && this->_members.size() >= static_cast<size_t>(this->user_limit))
     {
-        std::string message = ":" + std::string(SERVERNAME) + " 471 " + this->_name + " :Cannot join channel (+l)";
-        send(client->fd, message.c_str(), message.length(), 0);
+		_print_error("Cannot join channel (+l)", ":" + std::string(SERVERNAME) + " 471 " + this->_name + " :Cannot join channel (+l)\r\n", client->fd);
         return (false);
     }
     // Add client to the channel
     this->_members[client->nickname] = client;
-    std::string message = ":" + client->nickname + "!" + client->username + "@" + client->hostname + " JOIN :" + this->_name + "\r\n";
-    send(client->fd, message.c_str(), message.length(), 0);
-    std::cout << BLUE << "SERVER: " << client->nickname << " joined " << this->_name << RESET << std::endl;
+	_print_message(client->nickname + " joined " + this->_name, ":" + client->nickname + "!" + client->username + "@" + client->hostname + " JOIN :" + this->_name + "\r\n", client->fd);
     return (true);
 }
 
@@ -131,8 +126,7 @@ bool Channel::join(Client *client, std::string password) {
     // if channel is password protected, check if client has password
     if (this->key_password && password != this->_password)
     {
-        std::string message = ":" + std::string(SERVERNAME) + " 475 " + this->_name + " :Cannot join channel (+k)";
-        send(client->fd, message.c_str(), message.length(), 0);
+		_print_error("Cannot join channel (+k)", ":" + std::string(SERVERNAME) + " 475 " + this->_name + " :Cannot join channel (+k)\r\n", client->fd);
         return (false);
     }
     // if channel is invite only, check if client is invited
@@ -141,23 +135,19 @@ bool Channel::join(Client *client, std::string password) {
         // Check that the client nick is in the _invited list
         if (this->_invited.find(client->nickname) == this->_invited.end())
         {
-            std::string message = ":" + std::string(SERVERNAME) + " 473 " + this->_name + " :Cannot join channel (+i)";
-            send(client->fd, message.c_str(), message.length(), 0);
+			_print_error("Cannot join channel (+i)", ":" + std::string(SERVERNAME) + " 473 " + this->_name + " :Cannot join channel (+i)\r\n", client->fd);
             return (false);
         }
     }
     // if channel is full (user_limit), reject client
     if (this->user_limit > 0 && this->_members.size() >= static_cast<size_t>(this->user_limit))
     {
-        std::string message = ":" + std::string(SERVERNAME) + " 471 " + this->_name + " :Cannot join channel (+l)";
-        send(client->fd, message.c_str(), message.length(), 0);
+		_print_error("Cannot join channel (+l)", ":" + std::string(SERVERNAME) + " 471 " + this->_name + " :Cannot join channel (+l)\r\n", client->fd);
         return (false);
     }
     // Add client to the channel
     this->_members[client->nickname] = client;
-    std::string message = ":" + client->nickname + "!" + client->username + "@" + client->hostname + " JOIN :" + this->_name + "\r\n";
-    send(client->fd, message.c_str(), message.length(), 0);
-    std::cout << BLUE << "SERVER: " << client->nickname << " joined " << this->_name << RESET << std::endl;
+	_print_message(client->nickname + " joined " + this->_name, ":" + client->nickname + "!" + client->username + "@" + client->hostname + " JOIN :" + this->_name + "\r\n", client->fd);
     return (true);
 }
 
@@ -173,12 +163,7 @@ bool Channel::join(Client *client, std::string password) {
 void    Channel::change_topic(Client *client, std::string topic) {
     if (this->_members.find(client->nickname) == this->_members.end())
     {
-        std::cout << RED << "SERVER: " << client->nickname << " is not a member of " << this->_name << RESET << std::endl;
-        std::string message = ":" + std::string(SERVERNAME) + " 442 " + this->_name + " :You're not on that channel";
-        if (send(client->fd, message.c_str(), message.length(), 0) < 0)
-        {
-            std::cerr << RED << "SERVER: Error sending channel not found error message to client" << RESET << std::endl;
-        }
+		_print_error(client->nickname + " is not a member of " + this->_name, ":" + std::string(SERVERNAME) + " 442 " + this->_name + " :You're not on that channel\r\n", client->fd);
         if (this->_operators.find(client->nickname) != this->_operators.end())
             this->_operators.erase(client->nickname);
         return ;
@@ -187,9 +172,7 @@ void    Channel::change_topic(Client *client, std::string topic) {
     {
         if (this->_operators.find(client->nickname) == this->_operators.end())
         {
-            std::cout << RED << "SERVER: " << client->nickname << " is not a channel operator" << RESET << std::endl;
-            std::string message = ":" + std::string(SERVERNAME) + " 482 " + this->_name + " :You're not channel operator";
-            send(client->fd, message.c_str(), message.length(), 0);
+			_print_error(client->nickname + " is not a channel operator", ":" + std::string(SERVERNAME) + " 482 " + this->_name + " :You're not channel operator\r\n", client->fd);
             return ;
         }
     }
@@ -200,36 +183,19 @@ void    Channel::change_topic(Client *client, std::string topic) {
 
 void    Channel::get_topic(Client *client)
 {
-    std::cout << BLUE << "SERVER: TOPIC for " << this->_name << ": " << this->topic << RESET << std::endl;
-    std::string message = ":" + std::string(SERVERNAME) + " 332 " + client->nickname + " " + this->_name + " " + this->topic + "\r\n";
-    if (send(client->fd, message.c_str(), message.length(), 0) < 0)
-    {
-        std::cerr << RED << "SERVER: Error sending topic message to client" << RESET << std::endl;
-    }
+	_print_message("Sending topic " + this->topic + " to " + client->nickname, ":" + std::string(SERVERNAME) + " 332 " + client->nickname + " " + this->_name + " " + this->topic + "\r\n", client->fd);
 }
 
 /**
  * @brief Changes the mode of the channel
  * 
- * @param client The client changing the mode
  * @param mode The mode to change
  * 
  * @note Client format message: :<nickname
  * @note Server format message: :<servername> 482 <channel> :You're not channel operator
  */
-void    Channel::change_mode(Client *client, std::string mode)
+void    Channel::change_mode(std::string mode)
 {
-    // Check if the client is an operator
-    if (this->_operators.find(client->nickname) == this->_operators.end())
-    {
-        std::cout << RED << "SERVER: " << client->nickname << " is not a channel operator" << RESET << std::endl;
-        std::string message = ":" + std::string(SERVERNAME) + " 482 " + this->_name + " :You're not channel operator\r\n";
-        if (send(client->fd, message.c_str(), message.length(), 0) < 0)
-        {
-            std::cerr << RED << "SERVER: Error sending channel not found error message to client" << RESET << std::endl;
-        }
-        return ;
-    }
     if (mode[0] == '+')
     {
         if (mode[1] == 'i')
@@ -258,16 +224,6 @@ void    Channel::change_mode(Client *client, std::string mode)
  */
 void    Channel::change_mode(Client *client, std::string mode, std::string arg)
 {
-    if (this->_operators.find(client->nickname) == this->_operators.end())
-    {
-        std::cout << RED << "SERVER: " << client->nickname << " is not a channel operator" << RESET << std::endl;
-        std::string message = ":" + std::string(SERVERNAME) + " 482 " + this->_name + " :You're not channel operator";
-        if (send(client->fd, message.c_str(), message.length(), 0) < 0)
-        {
-            std::cerr << RED << "SERVER: Error sending channel not found error message to client" << RESET << std::endl;
-        }
-        return ;
-    }
     if (mode[0] == '+')
     {
         if (mode[1] == 'k')
@@ -279,15 +235,17 @@ void    Channel::change_mode(Client *client, std::string mode, std::string arg)
         {
             int limit = std::atoi(arg.c_str());
             if (arg.empty() || (limit == 0 && arg != "0"))
-            {
-                std::cerr << RED << "SERVER: Error: Invalid number format" << RESET << std::endl;
-                std::string message = ":" + std::string(SERVERNAME) + " 461 " + _name + " :Not enough parameters";
-                if (send(client->fd, message.c_str(), message.length(), 0) < 0)
-                    std::cerr << RED << "SERVER: Error sending channel not found error message to client" << RESET << std::endl;
-            }
+				_print_error("Invalid number format", ":" + std::string(SERVERNAME) + " 461 " + _name + " :Not enough parameters", client->fd);
             else
                 user_limit = limit;
         }
+		else if (mode[1] == 'o')
+		{
+			if (this->_members.find(arg) != this->_members.end())
+				this->_add_operator(this->_members[arg]);
+			else
+				_print_error("No such client", ":" + std::string(SERVERNAME) + " 401 " + client->nickname + " " + arg + " :No such client\r\n", client->fd);
+		}
     }
     else if (mode[0] == '-')
     {
@@ -300,6 +258,13 @@ void    Channel::change_mode(Client *client, std::string mode, std::string arg)
         {
             this->user_limit = 0;
         }
+		else if (mode[1] == 'o')
+		{
+			if (this->_operators.find(arg) != this->_operators.end())
+				this->_operators.erase(arg);
+			else
+				_print_error("No such client", ":" + std::string(SERVERNAME) + " 401 " + client->nickname + " " + arg + " :No such client\r\n", client->fd);
+		}
     }
 }
 

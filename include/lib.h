@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 13:14:18 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/24 09:37:41 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/11/10 21:09:30 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,5 +41,10 @@
 # define RED     "\033[31m"
 
 # define SERVERNAME "IRC.42.fr"
+
+std::vector<std::string>	split_cmd(const std::string& str);
+std::vector<std::string>	split_by(const std::string& str, char delim);
+void						_print_error(const std::string &context, const std::string &errorMessage, int client_fd = -1);
+void						_print_message(const std::string &context, const std::string &message, int client_fd = -1);
 
 #endif

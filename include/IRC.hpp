@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/27 13:16:01 by echavez-          #+#    #+#             */
-/*   Updated: 2024/11/10 18:43:18 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/11/10 21:09:24 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,9 +49,8 @@ private:
 	void				_read_from_client(int fd);
 	void				_read_client_message(int fd);
     //command handler for communication (PRIVMSG, JOIN, PART, etc)
-	void				_print_error(const std::string &context, const std::string &errorMessage, int client_fd = -1) const;
-	void				_print_message(const std::string &context, const std::string &message, int client_fd = -1) const;
     void                _interaction(std::string command, int fd);
+	int	                _channel_member_type(std::string channel, int client_fd);
     void                _cmd_join(std::string channels, std::string passwords, int client_fd);
 	void				_cmd_privmsg(std::string target, std::string message, int client_fd);
 	void				_cmd_invite(std::string nickname, std::string channel, int client_fd);
@@ -88,8 +87,5 @@ public:
 	int					getPort(void) const;
 	std::string			getPassword(void) const;
 };
-
-std::vector<std::string>	split_cmd(const std::string& str);
-std::vector<std::string>	split_by(const std::string& str, char delim);
 
 #endif
