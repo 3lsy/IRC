@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 18:12:53 by echavez-          #+#    #+#             */
-/*   Updated: 2024/11/10 21:33:53 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/11/10 22:54:18 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,8 +106,9 @@ bool Channel::join(Client *client) {
     }
     // Add client to the channel
     this->_members[client->nickname] = client;
-	_print_message(client->nickname + " joined " + this->_name, ":" + client->nickname + "!" + client->username + "@" + client->hostname + " JOIN :" + this->_name + "\r\n", client->fd);
-    return (true);
+	this->_broadcast(":" + client->nickname + "!" + client->username + "@" + client->hostname + " JOIN :" + this->_name + "\r\n");
+	std::cout << BLUE << "SERVER: " << client->nickname << " joined " << this->_name << RESET << std::endl;
+	return (true);
 }
 
 /**
@@ -147,7 +148,8 @@ bool Channel::join(Client *client, std::string password) {
     }
     // Add client to the channel
     this->_members[client->nickname] = client;
-	_print_message(client->nickname + " joined " + this->_name, ":" + client->nickname + "!" + client->username + "@" + client->hostname + " JOIN :" + this->_name + "\r\n", client->fd);
+	this->_broadcast(":" + client->nickname + "!" + client->username + "@" + client->hostname + " JOIN :" + this->_name + "\r\n");
+	std::cout << BLUE << "SERVER: " << client->nickname << " joined " << this->_name << RESET << std::endl;
     return (true);
 }
 
@@ -183,7 +185,10 @@ void    Channel::change_topic(Client *client, std::string topic) {
 
 void    Channel::get_topic(Client *client)
 {
-	_print_message("Sending topic " + this->topic + " to " + client->nickname, ":" + std::string(SERVERNAME) + " 332 " + client->nickname + " " + this->_name + " " + this->topic + "\r\n", client->fd);
+	if (this->topic.empty())
+		_print_message("No topic for " + this->_name, ":" + std::string(SERVERNAME) + " 331 " + client->nickname + " " + this->_name + " :No topic is set\r\n", client->fd);
+	else
+		_print_message("Sending topic " + this->topic + " to " + client->nickname, ":" + std::string(SERVERNAME) + " 332 " + client->nickname + " " + this->_name + " " + this->topic + "\r\n", client->fd);
 }
 
 /**
@@ -191,24 +196,40 @@ void    Channel::get_topic(Client *client)
  * 
  * @param mode The mode to change
  * 
- * @note Client format message: :<nickname
+ * @note Client format message: :<nickname>!<username>@<hostname> MODE <channel> <mode>
  * @note Server format message: :<servername> 482 <channel> :You're not channel operator
  */
-void    Channel::change_mode(std::string mode)
+void    Channel::change_mode(Client *client, std::string mode)
 {
     if (mode[0] == '+')
     {
         if (mode[1] == 'i')
+		{
             this->invite_only = true;
+			this->_broadcast(":" + client->nickname + "!" + client->username + "@" + client->hostname + " MODE " + this->_name + " +i\r\n");
+			std::cout << BLUE << "SERVER: Channel is now invite only" << RESET << std::endl;
+		}
         else if (mode[1] == 't')
+		{
             this->topic_locked = true;
+			this->_broadcast(":" + client->nickname + "!" + client->username + "@" + client->hostname + " MODE " + this->_name + " +t\r\n");
+			std::cout << BLUE << "SERVER: Channel topic is now locked" << RESET << std::endl;
+		}
     }
     else if (mode[0] == '-')
     {
         if (mode[1] == 'i')
+		{
             this->invite_only = false;
+			this->_broadcast(":" + client->nickname + "!" + client->username + "@" + client->hostname + " MODE " + this->_name + " -i\r\n");
+			std::cout << BLUE << "SERVER: Channel is no longer invite only" << RESET << std::endl;
+		}
         else if (mode[1] == 't')
+		{
             this->topic_locked = false;
+			this->_broadcast(":" + client->nickname + "!" + client->username + "@" + client->hostname + " MODE " + this->_name + " -t\r\n");
+			std::cout << BLUE << "SERVER: Channel topic is no longer locked" << RESET << std::endl;
+		}
     }
 }
 
@@ -230,6 +251,8 @@ void    Channel::change_mode(Client *client, std::string mode, std::string arg)
         {
             this->key_password = true;
             this->_password = arg;
+			this->_broadcast(":" + client->nickname + "!" + client->username + "@" + client->hostname + " MODE " + this->_name + " +k " + "\r\n");
+			std::cout << BLUE << "SERVER: Channel is now password protected" << RESET << std::endl;
         }
         else if (mode[1] == 'l')
         {
@@ -237,12 +260,20 @@ void    Channel::change_mode(Client *client, std::string mode, std::string arg)
             if (arg.empty() || (limit == 0 && arg != "0"))
 				_print_error("Invalid number format", ":" + std::string(SERVERNAME) + " 461 " + _name + " :Not enough parameters", client->fd);
             else
+			{
                 user_limit = limit;
+				this->_broadcast(":" + client->nickname + "!" + client->username + "@" + client->hostname + " MODE " + this->_name + " +l " + arg + "\r\n");
+				std::cout << BLUE << "SERVER: Channel user limit is now " << limit << RESET << std::endl;
+			}
         }
 		else if (mode[1] == 'o')
 		{
 			if (this->_members.find(arg) != this->_members.end())
+			{
 				this->_add_operator(this->_members[arg]);
+				this->_broadcast(":" + client->nickname + "!" + client->username + "@" + client->hostname + " MODE " + this->_name + " +o " + arg + "\r\n");
+				std::cout << BLUE << "SERVER: " << arg << " is now an operator of " << this->_name << RESET << std::endl;
+			}
 			else
 				_print_error("No such client", ":" + std::string(SERVERNAME) + " 401 " + client->nickname + " " + arg + " :No such client\r\n", client->fd);
 		}
@@ -253,15 +284,23 @@ void    Channel::change_mode(Client *client, std::string mode, std::string arg)
         {
             this->key_password = false;
             this->_password = "";
+			this->_broadcast(":" + client->nickname + "!" + client->username + "@" + client->hostname + " MODE " + this->_name + " -k\r\n");
+			std::cout << BLUE << "SERVER: Channel is no longer password protected" << RESET << std::endl;
         }
         else if (mode[1] == 'l')
         {
             this->user_limit = 0;
+			this->_broadcast(":" + client->nickname + "!" + client->username + "@" + client->hostname + " MODE " + this->_name + " -l\r\n");
+			std::cout << BLUE << "SERVER: Channel user limit is now 0" << RESET << std::endl;
         }
 		else if (mode[1] == 'o')
 		{
 			if (this->_operators.find(arg) != this->_operators.end())
+			{
 				this->_operators.erase(arg);
+				this->_broadcast(":" + client->nickname + "!" + client->username + "@" + client->hostname + " MODE " + this->_name + " -o " + arg + "\r\n");
+				std::cout << BLUE << "SERVER: " << arg << " is no longer an operator of " << this->_name << RESET << std::endl;
+			}
 			else
 				_print_error("No such client", ":" + std::string(SERVERNAME) + " 401 " + client->nickname + " " + arg + " :No such client\r\n", client->fd);
 		}

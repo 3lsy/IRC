@@ -6,7 +6,7 @@
 /*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/11 19:47:39 by echavez-          #+#    #+#             */
-/*   Updated: 2024/11/10 21:39:00 by echavez-         ###   ########.fr       */
+/*   Updated: 2024/11/10 23:12:05 by echavez-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,6 +215,9 @@ void    IRC::_cmd_join(std::string channels, std::string passwords, int client_f
             this->_channels[chans[i]]->join(this->_clients[client_fd]);
         else
             this->_channels[chans[i]]->join(this->_clients[client_fd], pass[i]);
+		// Send the channel topic to the client if successfuly joined
+		if (this->_channel_member_type(chans[i], client_fd) != 0)
+			this->_channels[chans[i]]->get_topic(this->_clients[client_fd]);
     }
 }
 
@@ -233,6 +236,11 @@ void    IRC::_cmd_privmsg(std::string target, std::string message, int client_fd
 	if (target[0] == '#' || target[0] == '&')
 	{
 		if (this->_channels.find(target) != this->_channels.end()) {
+			if (this->_channel_member_type(target, client_fd) == 0)
+			{
+				_print_error("Not on channel", ":" + std::string(SERVERNAME) + " 442 " + this->_clients[client_fd]->nickname + " " + target + " :You're not on that channel\r\n", client_fd);
+				return ;
+			}
 			this->_send_to_channel(client_fd, this->_channels[target], message);
 		}
 		else {
@@ -420,7 +428,7 @@ void    IRC::_cmd_topic(std::string channel, int client_fd)
 void    IRC::_cmd_mode(std::string target, std::string mode, int client_fd)
 {
     if (this->_channels.find(target) != this->_channels.end())
-        this->_channels[target]->change_mode(mode);
+        this->_channels[target]->change_mode(this->_clients[client_fd], mode);
     else
     {
 		_print_error("No such channel", ":" + std::string(SERVERNAME) + " 403 " + target + " :No such channel\r\n", client_fd);
