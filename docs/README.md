@@ -1,4 +1,5 @@
 # IRC
+
 ## Internet Relay Chat
 
 ### IRC Client Comparison
@@ -13,6 +14,10 @@
 | **Customization**         | Moderate                  | High                       | Very high (plugins and scripts) |
 | **Community Support**     | Strong                    | Strong                     | Strong                   |
 | **Modern Features**       | Yes (GUI-based)           | No                         | Yes (CLI-based)          |
+
+## IRC Sequence
+### Login
+![IRC-login](https://github.com/user-attachments/assets/2b846c38-c373-4498-a6e9-aeafc9bd8e39)
 
 ## Usage
 
