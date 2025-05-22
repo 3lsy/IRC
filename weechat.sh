@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Usage: ./launch_weechat.sh <nickname> <port> <password>
+# Usage: ./weechat.sh <nickname> <port> <password>
 
 NICKNAME="$1"
 PORT="$2"
