@@ -59,6 +59,7 @@ private:
     void                _cmd_topic(std::string channel, int client_fd);
     void                _cmd_mode(std::string channel, std::string mode, int client_fd);
     void                _cmd_mode(std::string channel, std::string mode, std::string arg, int client_fd);
+	void				_cmd_nick(std::string nickname, int client_fd);
 	//find methods
 	bool				_find_user_by_nickname(std::string nickname);
 	//send messages methods
