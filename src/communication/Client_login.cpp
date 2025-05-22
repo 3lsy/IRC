@@ -52,7 +52,7 @@ std::vector<std::string>    split_by(const std::string& str, char delim)
  * @note Ignore unhandled commands (e.g. PING, PONG, CAP, etc.)
  * @note Client welcome message: :<servername> 001 <nickname> :Welcome to the Internet Relay Network <nickname>!<username>@<hostname>
  */
-bool Client::login(std::string command)
+bool Client::login(std::string command, std::map<std::string, int> nicknames)
 {
     bool    success;
 
@@ -70,7 +70,7 @@ bool Client::login(std::string command)
 	{
 		if (cmd.size() < 2)
 			return (false);
-		this->_cmd_nick(cmd[1]);
+		this->_cmd_nick(cmd[1], nicknames);
 	}
 	else if (cmd[0] == "USER")
 	{
@@ -125,13 +125,18 @@ bool	Client::_cmd_pass(std::string password)
  * 
  * @param nickname The nickname received from the client
  */
-void	Client::_cmd_nick(std::string nickname)
+void	Client::_cmd_nick(std::string nickname, std::map<std::string, int> nicknames)
 {
     if (!is_valid_nick(nickname))
     {
         _print_error("Invalid nickname", ":" + std::string(SERVERNAME) + " 432 " + this->nickname + " " + nickname + " :Erroneous nickname\r\n", this->fd);
         return ;
     }
+    if (nicknames.find(nickname) != nicknames.end())
+	{
+		_print_error("Nickname already in use", ":" + std::string(SERVERNAME) + " 433 * " + nickname + " :Nickname is already in use\r\n", this->fd);
+		return ;
+	}
     this->nickname = nickname;
 }
 

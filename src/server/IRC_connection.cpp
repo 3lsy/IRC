@@ -29,7 +29,7 @@ void IRC::_new_connection(void)
 
     Client* client = new Client(client_fd, client_addr);
     FD_SET(client->fd, &this->_master_set);
-    
+
     if (client->fd > this->_max_fd) {
         this->_max_fd = client->fd;
     }
@@ -53,24 +53,12 @@ void    IRC::_read_client_message(int fd)
 {
     if (!this->_clients[fd]->logged_in)
     {
-        if (this->_clients[fd]->login(this->_buffer) == false)
+        if (this->_clients[fd]->login(this->_buffer, this->_nicknames) == false)
         {
             this->remove_client(fd);
-            return ;   
-        }
-        // if nickname is already in use, remove client
-        if (this->_nicknames.find(this->_clients[fd]->nickname) != this->_nicknames.end())
-        {
-            std::cerr << RED << "SERVER: Error: Nickname already in use" << RESET << std::endl;
-            std::string errorMessage = ":" + std::string(SERVERNAME) + " 433 * " + this->_clients[fd]->nickname + " :Nickname is already in use\r\n";
-            if (send(fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
-            {
-                std::cerr << RED << "SERVER: Error sending nickname error message to client" << RESET << std::endl;
-            }
-            this->remove_client(fd, false);
             return ;
         }
-        else if (this->_clients[fd]->logged_in)
+        if (this->_clients[fd]->logged_in)
             this->_nicknames[this->_clients[fd]->nickname] = fd;
     }
     else

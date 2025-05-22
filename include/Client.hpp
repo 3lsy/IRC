@@ -31,7 +31,7 @@ class Client {
 		std::string			_ip;
 		// Command methods
 		bool	            _cmd_pass(std::string password);
-		void	            _cmd_nick(std::string nickname);
+		void	            _cmd_nick(std::string nickname, std::map<std::string, int> nicknames);
 		void	            _cmd_user(std::string username, std::string hostname, 
 					            	std::string servername, std::string realname);
 		void	            _cmd_quit(void);
@@ -50,7 +50,7 @@ class Client {
 		Client(int fd, struct sockaddr_in addr);
 		~Client(void);
 		//command handler for PASS, NICK, USER, QUIT
-		bool	            login(std::string command);
+		bool	            login(std::string command, std::map<std::string, int> nicknames);
 		void				send_message(int client_fd, std::string message);
 		bool				is_valid_nick(std::string& nick);
 };
