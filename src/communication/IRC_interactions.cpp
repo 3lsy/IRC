@@ -270,7 +270,6 @@ void    IRC::_cmd_privmsg(std::string target, std::string message, int client_fd
 	else
 	{
 		if (this->_find_user_by_nickname(target)) {
-            std::cout << BLUE << "SERVER: Sending message to " << target << RESET << std::endl;
 			this->_send_to_client(client_fd, this->_nicknames[target], message);
 		}
 		else {
@@ -321,9 +320,12 @@ void	IRC::_send_to_channel(int client_fd, Channel *channel, std::string message)
  * @note Client format message: :<nickname>!<username>@<hostname> PRIVMSG <target> :<message>
  */
 void	IRC::_send_to_client(int client_fd, int target_fd, std::string message) {
-	if (FD_ISSET(target_fd, &this->_write_set))// && target_fd != client_fd) // for testing purposes, this returns the message to the sender too
-	{
-		_print_message("Sending message to " + this->_clients[target_fd]->nickname, ":" + this->_clients[client_fd]->nickname + '!' + this->_clients[client_fd]->username + '@' + this->_clients[client_fd]->hostname + " PRIVMSG " + this->_clients[target_fd]->nickname + " " + message + "\r\n", target_fd);
+	std::string formatted_msg = ":" + this->_clients[client_fd]->nickname + '!' +
+		this->_clients[client_fd]->username + '@' + this->_clients[client_fd]->hostname +
+		" PRIVMSG " + this->_clients[target_fd]->nickname + " " + message + "\r\n";
+
+	if (FD_ISSET(target_fd, &this->_write_set)) {
+		_print_message("Sending message to " + this->_clients[target_fd]->nickname, formatted_msg, target_fd);
 	}
 }
 
