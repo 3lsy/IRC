@@ -108,8 +108,14 @@ void    IRC::_interaction(std::string command, int client_fd)
             std::string message = command.substr(command.find(cmd[2]));
             this->_cmd_privmsg(cmd[1], message, client_fd);
         }
-		else
+		else if (cmd.size() == 2)
+		{
+			_print_error("No message given", ":" + std::string(SERVERNAME) + " 411 " + cmd[1] + " :No text to send\r\n", client_fd);
 			return ;
+		}
+		else {
+			return ;
+		}
 	}
 	else if (cmd[0] == "INVITE")
 	{
@@ -122,12 +128,12 @@ void    IRC::_interaction(std::string command, int client_fd)
 	}
 	else if (cmd[0] == "NICK")
 	{
-		if (cmd.size() == 2)
+		if (cmd.size() >= 2 && !cmd[1].empty())
 		{
 			this->_cmd_nick(cmd[1], client_fd);
 		}
 		else {
-			_print_error("Incorrect NICK command", ":" + std::string(SERVERNAME) + " 431 " + cmd[1] + " :No nickname given\r\n", client_fd);
+			_print_error("Incorrect NICK command", ":" + std::string(SERVERNAME) + " 431 * :No nickname given\r\n", client_fd);
 			return ;
 		} ;
 	}
