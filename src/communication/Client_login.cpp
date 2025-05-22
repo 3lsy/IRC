@@ -127,6 +127,11 @@ bool	Client::_cmd_pass(std::string password)
  */
 void	Client::_cmd_nick(std::string nickname)
 {
+    if (!is_valid_nick(nickname))
+    {
+        _print_error("Invalid nickname", ":" + std::string(SERVERNAME) + " 432 " + this->nickname + " " + nickname + " :Erroneous nickname\r\n", this->fd);
+        return ;
+    }
     this->nickname = nickname;
 }
 
@@ -157,13 +162,13 @@ void	Client::_cmd_quit(void)
 
 bool    Client::is_valid_nick(std::string& nick)
 { 
-    if (nick.empty() || nick.length() > 9 || !isalpha(nick[0]))
+    if (nick.empty() || nick.length() > 9)
         return false;
 
-    for (size_t i = 1; i < nick.length(); ++i)
+    for (size_t i = 0; i < nick.length(); ++i)
     {
         char c = nick[i];
-        if (!isalnum(c) && c != '-' && c != '[' && c != ']' && c != '\\' &&
+        if (!isalnum(c) && c != '-' && c != '_' && c != '[' && c != ']' && c != '\\' &&
             c != '`' && c != '^' && c != '{' && c != '}') {
             return false;
         }
