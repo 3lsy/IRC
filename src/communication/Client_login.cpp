@@ -82,6 +82,14 @@ bool Client::login(std::string command, std::map<std::string, int> nicknames)
     {
         this->_cmd_quit();
     }
+    else if (cmd[0] == "CAP")
+    {
+        return (true);
+    }
+    else
+    {
+        _print_error("Unknown command", ":" + std::string(SERVERNAME) + " 421 " + cmd[0] + " :Unknown command\r\n", this->fd);
+    }
 
     if (this->_password && this->nickname != "" && this->username != "" && this->realname != "")
     {

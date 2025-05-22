@@ -176,6 +176,15 @@ void    IRC::_interaction(std::string command, int client_fd)
         }
         std::cout << BLUE << "SERVER: PONG sent to client" << RESET << std::endl;
     }
+	else if (cmd[0] == "QUIT")
+	{
+		return ;
+	}
+	else
+	{
+		_print_error("Unknown command", ":" + std::string(SERVERNAME) + " 421 " + cmd[0] + " :Unknown command\r\n", client_fd);
+		return ;
+	}
 }
 
 /**
