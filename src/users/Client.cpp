@@ -15,17 +15,10 @@
 Client::Client(void) {
 }
 
-Client::Client(int server_fd) : _password(false), _servername(""), _mode(""), _ip(""), nickname(""),
-                                username(""), realname(""), hostname(""), logged_in(false)
+Client::Client(int fd, struct sockaddr_in addr) : _password(false), _servername(""), _mode(""), _ip(""), fd(fd), nickname(""),
+                                username(""), realname(""), hostname(""), logged_in(false), socket_addr(addr)
 {
 	this->socket_len = sizeof(this->socket_addr);
-	this->fd = accept(server_fd, (struct sockaddr *)&this->socket_addr, &this->socket_len);
-	if (this->fd < 0)
-	{
-		std::cerr << RED << "SERVER: Error: Unable to accept connection" << RESET << std::endl;
-		return ;
-	}
-	std::cout << BLUE << "SERVER: New connection from " << inet_ntoa(this->socket_addr.sin_addr) << RESET << std::endl;
 }
 
 Client::~Client(void) {

@@ -15,14 +15,21 @@
 
 void IRC::_new_connection(void)
 {
-    Client *client = new Client(this->_socket_fd);
-
-    if (client->fd < 0) {
-        delete client;
-        client = NULL;
-        return ;
+    struct sockaddr_in	client_addr;
+    socklen_t			addr_len = sizeof(client_addr);
+    int client_fd = accept(this->_socket_fd, (struct sockaddr *)&client_addr, &addr_len);
+    
+    if (client_fd < 0) {
+        std::cerr << RED << "SERVER: Error: Unable to accept connection: "
+                  << strerror(errno) << RESET << std::endl;
+        return;
     }
+    std::cout << BLUE << "SERVER: New connection from " 
+              << inet_ntoa(client_addr.sin_addr) << RESET << std::endl;
+
+    Client* client = new Client(client_fd, client_addr);
     FD_SET(client->fd, &this->_master_set);
+    
     if (client->fd > this->_max_fd) {
         this->_max_fd = client->fd;
     }

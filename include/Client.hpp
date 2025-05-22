@@ -47,7 +47,7 @@ class Client {
 		socklen_t			socket_len;
 		// Methods
 		Client(void);
-		Client(int fd);
+		Client(int fd, struct sockaddr_in addr);
 		~Client(void);
 		//command handler for PASS, NICK, USER, QUIT
 		bool	            login(std::string command);
