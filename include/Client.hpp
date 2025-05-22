@@ -52,6 +52,7 @@ class Client {
 		//command handler for PASS, NICK, USER, QUIT
 		bool	            login(std::string command);
 		void				send_message(int client_fd, std::string message);
+		bool				is_valid_nick(std::string& nick);
 };
 
 #endif

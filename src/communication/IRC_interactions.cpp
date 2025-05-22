@@ -127,7 +127,7 @@ void    IRC::_interaction(std::string command, int client_fd)
 			this->_cmd_nick(cmd[1], client_fd);
 		}
 		else {
-			
+			_print_error("Incorrect NICK command", ":" + std::string(SERVERNAME) + " 431 " + cmd[1] + " :No nickname given\r\n", client_fd);
 			return ;
 		} ;
 	}
@@ -358,13 +358,19 @@ void    IRC::_cmd_invite(std::string nickname, std::string channel, int client_f
 
 void	IRC::_cmd_nick(std::string nickname, int client_fd)
 {
+	Client* client = this->_clients[client_fd];
+
+	if (!client->is_valid_nick(nickname))
+	{
+		_print_error("Invalid nickname", ":" + std::string(SERVERNAME) + " 432 " + this->_clients[client_fd]->nickname + " " + nickname + " :Erroneous nickname\r\n", client_fd);
+		return ;
+	}
 	if (this->_nicknames.find(nickname) != this->_nicknames.end())
 	{
 		_print_error("Nickname already in use", ":" + std::string(SERVERNAME) + " 433 * " + nickname + " :Nickname is already in use\r\n", client_fd);
 		return ;
 	}
-	
-	Client* client = this->_clients[client_fd];
+
     std::string old_nick = client->nickname;
 
     client->nickname = nickname;

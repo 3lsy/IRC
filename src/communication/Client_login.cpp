@@ -154,3 +154,19 @@ void	Client::_cmd_quit(void)
 {
     IRC::getInstance()->remove_client(this->fd);
 }
+
+bool    Client::is_valid_nick(std::string& nick)
+{ 
+    if (nick.empty() || nick.length() > 9 || !isalpha(nick[0]))
+        return false;
+
+    for (size_t i = 1; i < nick.length(); ++i)
+    {
+        char c = nick[i];
+        if (!isalnum(c) && c != '-' && c != '[' && c != ']' && c != '\\' &&
+            c != '`' && c != '^' && c != '{' && c != '}') {
+            return false;
+        }
+    }
+    return true;
+}
