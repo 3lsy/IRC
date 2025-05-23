@@ -52,10 +52,12 @@ void _print_message(const std::string &context, const std::string &message, int 
  * @param channel The channel to check
  * @param client_fd The file descriptor of the client
  * 
- * @return 0 if not a member, 1 if member, 2 if operator
+ * @return 0 if not a member, 1 if member, 2 if operator, -1 if channel not found
  */
 int IRC::_channel_member_type(std::string channel, int client_fd)
 {
+	if (this->_channels.find(channel) == this->_channels.end())
+		return -1;
 	std::map<std::string, Client *> members = this->_channels[channel]->get_members();
 	std::map<std::string, Client *> operators = this->_channels[channel]->get_operators();
 
@@ -85,9 +87,20 @@ void    IRC::_interaction(std::string command, int client_fd)
 	
 	if (cmd[0] == "MODE" || cmd[0] == "INVITE" || cmd[0] == "KICK")
 	{
-		if (this->_channel_member_type(cmd[1], client_fd) != 2)
+		if (cmd.size() < 2)
 		{
-			_print_error("Not channel operator", ":" + std::string(SERVERNAME) + " 482 " + cmd[1] + " :You're not channel operator\r\n", client_fd);
+			_print_error("Incorrect command", ":" + std::string(SERVERNAME) + " 461 " + cmd[0] + " :Not enough parameters\r\n", client_fd);
+			return ;
+		}
+		int member_type = this->_channel_member_type(cmd[1], client_fd);
+		if (member_type != 2)
+		{
+			if (member_type == 0)
+				_print_error("Not on channel", ":" + std::string(SERVERNAME) + " 442 " + cmd[1] + " :You're not on that channel\r\n", client_fd);
+			else if (member_type == -1)
+				_print_error("No such channel", ":" + std::string(SERVERNAME) + " 403 " + cmd[1] + " :No such channel\r\n", client_fd);
+			else
+				_print_error("Not channel operator", ":" + std::string(SERVERNAME) + " 482 " + cmd[1] + " :You're not channel operator\r\n", client_fd);
 			return ;
 		}
 	}
@@ -169,8 +182,8 @@ void    IRC::_interaction(std::string command, int client_fd)
             this->_cmd_mode(cmd[1], cmd[2], client_fd);
         else if (cmd.size() == 4)
             this->_cmd_mode(cmd[1], cmd[2], cmd[3], client_fd);
-        else
-            return ;
+		else
+			return ;
     }
     else if (cmd[0] == "PING")
     {
@@ -242,7 +255,7 @@ void    IRC::_cmd_join(std::string channels, std::string passwords, int client_f
         else
             this->_channels[chans[i]]->join(this->_clients[client_fd], pass[i]);
 		// Send the channel topic to the client if successfuly joined
-		if (this->_channel_member_type(chans[i], client_fd) != 0)
+		if (this->_channel_member_type(chans[i], client_fd) > 0)
 			this->_channels[chans[i]]->get_topic(this->_clients[client_fd]);
     }
 }
