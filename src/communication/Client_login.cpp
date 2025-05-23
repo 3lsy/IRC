@@ -93,8 +93,15 @@ bool Client::login(std::string command, std::map<std::string, int> nicknames)
 
     if (this->_password && this->nickname != "" && this->username != "" && this->realname != "")
     {
+
         std::string welcomeMessage = ":" + std::string(SERVERNAME) + " 001 " + this->nickname + " :Welcome to the Internet Relay Network " + this->nickname + "!" + this->username + "@" + this->hostname + "\r\n";
         std::cout << BLUE << "SERVER: Sending welcome message to client: " << this->nickname << RESET << std::endl;
+        std::cout << YELLOW << "SERVER{";
+        if (!this->nickname.empty())
+            std::cout << this->nickname;
+        else
+            std::cout << this->fd;
+        std::cout << "} " << welcomeMessage << RESET;
         if (send(this->fd, welcomeMessage.c_str(), welcomeMessage.length(), 0) < 0) {
             std::cerr << RED << "SERVER: Error sending welcome message to client" << RESET << std::endl;
         }

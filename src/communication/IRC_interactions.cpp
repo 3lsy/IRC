@@ -23,7 +23,8 @@
  */
 void _print_error(const std::string &context, const std::string &errorMessage, int client_fd)
 {
-    std::cerr << RED << "SERVER: Error: " << context << ": " << errorMessage << RESET << std::endl;
+	std::cerr << RED << "SERVER: Error: " << context << RESET << std::endl;
+	std::cerr << YELLOW << "SERVER{" << client_fd << "}: " << errorMessage << RESET;
     if (client_fd != -1)
     {
         if (send(client_fd, errorMessage.c_str(), errorMessage.length(), 0) < 0)
@@ -35,7 +36,8 @@ void _print_error(const std::string &context, const std::string &errorMessage, i
 
 void _print_message(const std::string &context, const std::string &message, int client_fd)
 {
-	std::cout << BLUE << "SERVER: " << context << ": " << message << RESET << std::endl;
+	std::cout << BLUE << "SERVER: " << context << RESET << std::endl;
+	std::cout << YELLOW << "SERVER{" << client_fd << "}: " << message << RESET;
 	if (client_fd != -1)
 	{
 		if (send(client_fd, message.c_str(), message.length(), 0) < 0)
@@ -212,12 +214,16 @@ void    IRC::_interaction(std::string command, int client_fd)
     else if (cmd[0] == "PING")
     {
         std::string pong = "PONG " + std::string(SERVERNAME) + "\r\n";
-        std::cout << BLUE << "SERVER: PING received from client " << this->_clients[client_fd]->nickname << RESET << std::endl;
         if (send(client_fd, pong.c_str(), pong.length(), 0) < 0)
         {
             std::cerr << RED << "SERVER: Error sending PONG message to client " << this->_clients[client_fd]->nickname << RESET << std::endl;
         }
-        std::cout << BLUE << "SERVER: PONG sent to client" << RESET << std::endl;
+		std::cout << GRAY << "SERVER{";
+		if (this->_clients[client_fd] && !this->_clients[client_fd]->nickname.empty())
+			std::cout << this->_clients[client_fd]->nickname;
+		else
+			std::cout << client_fd;
+		std::cout << "}: " << pong << RESET;
     }
 	else if (cmd[0] == "QUIT")
 	{
@@ -483,9 +489,7 @@ void    IRC::_cmd_kick(std::string channel, std::string nickname, std::string co
 	std::string kick_msg = ":" + this->_clients[client_fd]->nickname + " KICK " + channel + " " + nickname + " " + kick_comment + "\r\n";
 
 	//send kick message to all members
-	// this->_send_to_channel(client_fd, this->_channels[channel], kick_msg);
 	this->_channels[channel]->broadcast(kick_msg);
-	std::cout << BLUE << "SERVER: " << kick_msg << RESET << std::endl;
 	this->_channels[channel]->remove_member(nickname);
 }
 

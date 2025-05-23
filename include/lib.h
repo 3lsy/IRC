@@ -39,6 +39,8 @@
 # define BLUE    "\033[34m"
 # define GREEN   "\033[32m"
 # define RED     "\033[31m"
+# define YELLOW  "\033[33m"
+# define GRAY    "\033[90m"
 
 # define SERVERNAME "IRC.42.fr"
 

@@ -59,14 +59,20 @@ void    Channel::_add_operator(Client *client)
  */
 void    Channel::broadcast(std::string message)
 {
+    std::cout << BLUE << "SERVER: Broadcasting message to all members of " << this->_name << RESET << std::endl;
     for (std::map<std::string, Client *>::iterator it = this->_members.begin(); it != this->_members.end(); it++)
     {
         if (send(it->second->fd, message.c_str(), message.length(), 0) < 0)
         {
             std::cerr << RED << "SERVER: Error sending message to client " << it->second->nickname << RESET << std::endl;
         }
+        std::cout << YELLOW << "SERVER{";
+        if (!it->second->nickname.empty())
+            std::cout << it->second->nickname;
+        else
+            std::cout << it->second->fd;
+        std::cout << "}: " << message << RESET;
     }
-    std::cout << BLUE << "SERVER: Broadcasting message to all members of " << this->_name << RESET << std::endl;
 }
 
 /**
