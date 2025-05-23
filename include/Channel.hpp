@@ -36,7 +36,6 @@ class Channel {
 		std::map<std::string, Client *>	_operators; // o
 		std::map<std::string, Client *> _invited;
 		// Methods
-		void	                _broadcast(std::string message);
         void                    _add_operator(Client *client);
 	public:
 		// Attributes
@@ -48,6 +47,7 @@ class Channel {
 		Channel& operator=(const Channel &other);
 		Channel(const Channel &other);
 		~Channel();
+		void	                broadcast(std::string message);
 		bool					join(Client *client);
 		bool					join(Client *client, std::string password);
 		void					send_message(std::string _channel_name, std::string message);

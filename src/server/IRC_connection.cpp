@@ -84,7 +84,12 @@ void	IRC::_read_from_client(int fd)
 	else
 	{
 		this->_buffer[this->_bytes_read] = '\0';
-		std::cout << GREEN << "CLIENT: " << this->_buffer << RESET << std::endl;
+        std::cout << GREEN << "CLIENT{";
+        if (!this->_clients[fd]->nickname.empty())
+            std::cout << this->_clients[fd]->nickname;
+        else
+            std::cout << fd;
+        std::cout << "}: " << this->_buffer << RESET;
         std::vector<std::string> lines = split_by(this->_buffer, '\n');
         for (size_t i = 0; i < lines.size(); i++)
         {

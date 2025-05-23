@@ -169,7 +169,7 @@ void    IRC::_interaction(std::string command, int client_fd)
 		{
 			this->_cmd_kick(cmd[1], cmd[2], "", client_fd);
 		}
-		else if (cmd.size() == 4)
+		else if (cmd.size() >= 4)
 		{
 			std::string comment = command.substr(command.find(cmd[3]));
 			this->_cmd_kick(cmd[1], cmd[2], comment, client_fd);
@@ -477,13 +477,16 @@ void    IRC::_cmd_kick(std::string channel, std::string nickname, std::string co
 		_print_error("Not in channel", ":" + std::string(SERVERNAME) + " 441 " + this->_clients[client_fd]->nickname + " " + nickname + " " + channel + " :They aren't on that channel\r\n", client_fd);
 		return ;
 	}
-	_print_message("Kicking " + nickname + " from " + channel, ":" + this->_clients[client_fd]->nickname + " KICK " + channel + " " + nickname + " :" + comment + "\r\n", client_fd);
+	// _print_message("Kicking " + nickname + " from " + channel, ":" + this->_clients[client_fd]->nickname + " KICK " + channel + " " + nickname + " :" + comment + "\r\n", client_fd);
 	//kick the user
 	std::string kick_comment = comment.empty() ? nickname + "has been kicked from the channel" : comment;
-	this->_channels[channel]->remove_member(nickname);
-	std::string kick_msg = ":" + this->_clients[client_fd]->nickname + " KICK " + channel + " " + nickname + " :" + kick_comment + "\r\n";
+	std::string kick_msg = ":" + this->_clients[client_fd]->nickname + " KICK " + channel + " " + nickname + " " + kick_comment + "\r\n";
+
 	//send kick message to all members
-	this->_send_to_channel(client_fd, this->_channels[channel], kick_msg);
+	// this->_send_to_channel(client_fd, this->_channels[channel], kick_msg);
+	this->_channels[channel]->broadcast(kick_msg);
+	std::cout << BLUE << "SERVER: " << kick_msg << RESET << std::endl;
+	this->_channels[channel]->remove_member(nickname);
 }
 
 /**
