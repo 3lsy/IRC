@@ -316,7 +316,7 @@ std::map<std::string, Client *> Channel::get_operators(void) {
 	return (this->_operators);
 }
 
-std::map<std::string, Client *> Channel::get_invited(void) {
+std::map<std::string, Client *> &Channel::get_invited(void) {
 	return (this->_invited);
 }
 

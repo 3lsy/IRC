@@ -59,7 +59,7 @@ class Channel {
 		// setters and getters
 		std::map<std::string, Client *> get_members(void);
 		std::map<std::string, Client *> get_operators(void);
-		std::map<std::string, Client *> get_invited(void);
+		std::map<std::string, Client *> &get_invited(void);
 		std::string						get_name(void);
 		bool							get_invite_only(void);
 };

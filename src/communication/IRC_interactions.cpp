@@ -45,7 +45,6 @@ void _print_message(const std::string &context, const std::string &message, int 
 	}
 }
 
-
 /**
  * @brief Checks the type of member in a channel
  * 
@@ -134,7 +133,7 @@ void    IRC::_interaction(std::string command, int client_fd)
 					_print_error("Not channel operator", ":" + std::string(SERVERNAME) + " 482 " + cmd[1] + " :You're not channel operator\r\n", client_fd);
 				return ;
 			}
-			this->_cmd_invite(cmd[1], cmd[2], client_fd);
+				this->_cmd_invite(cmd[1], cmd[2], client_fd);
 		}
 		else
 			return ;	
@@ -385,7 +384,7 @@ void	IRC::_send_to_client(int client_fd, int target_fd, std::string message) {
 void    IRC::_cmd_invite(std::string nickname, std::string channel, int client_fd) {
 	std::map<std::string, Client *> members = this->_channels[channel]->get_members();
 	std::map<std::string, Client *> operators = this->_channels[channel]->get_operators();
-	//check if nickname and channel exists
+	//check if nickname exists
 	if (this->_nicknames.find(nickname) == this->_nicknames.end())
 	{
 		_print_error("No such nickname", ":" + std::string(SERVERNAME) + " 401 " + this->_clients[client_fd]->nickname + " " + nickname + " :No such nickname\r\n", client_fd);
@@ -400,9 +399,19 @@ void    IRC::_cmd_invite(std::string nickname, std::string channel, int client_f
 	//send invite message
 	else
 	{
-		_print_message("Sending invite to " + nickname, ":" + this->_clients[client_fd]->nickname + " INVITE " + nickname + " " + channel + "\r\n", client_fd);
-		//add to invited list
-		this->_channels[channel]->get_invited()[nickname] = this->_clients[this->_nicknames[nickname]];
+		Client* inviter = this->_clients[client_fd];
+		Client* invited = this->_clients[this->_nicknames[nickname]];
+
+		// Format INVITE message to send to the invited client
+		std::string invite_msg = ":" + inviter->nickname + "!" + inviter->username + "@" + inviter->hostname + " INVITE " + nickname + " :" + channel + "\r\n";
+		_print_message("Sending INVITE to " + nickname, invite_msg, invited->fd);
+
+		// Format confirmation message to send back to the inviter
+		std::string confirm_msg = ":" + std::string(SERVERNAME) + " 341 " + inviter->nickname + " " + nickname + " " + channel + "\r\n";
+		_print_message("INVITE confirmation to inviter", confirm_msg, client_fd);
+
+		// Add to invited list
+		this->_channels[channel]->get_invited()[nickname] = invited;
 	}
 }
 
