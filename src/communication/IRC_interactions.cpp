@@ -92,17 +92,6 @@ void    IRC::_interaction(std::string command, int client_fd)
 			_print_error("Incorrect command", ":" + std::string(SERVERNAME) + " 461 " + cmd[0] + " :Not enough parameters\r\n", client_fd);
 			return ;
 		}
-		int member_type = this->_channel_member_type(cmd[1], client_fd);
-		if (member_type != 2)
-		{
-			if (member_type == 0)
-				_print_error("Not on channel", ":" + std::string(SERVERNAME) + " 442 " + cmd[1] + " :You're not on that channel\r\n", client_fd);
-			else if (member_type == -1)
-				_print_error("No such channel", ":" + std::string(SERVERNAME) + " 403 " + cmd[1] + " :No such channel\r\n", client_fd);
-			else
-				_print_error("Not channel operator", ":" + std::string(SERVERNAME) + " 482 " + cmd[1] + " :You're not channel operator\r\n", client_fd);
-			return ;
-		}
 	}
 
     if (cmd[0] == "JOIN")
@@ -134,6 +123,17 @@ void    IRC::_interaction(std::string command, int client_fd)
 	{
 		if (cmd.size() == 3)
 		{
+			int member_type = this->_channel_member_type(cmd[2], client_fd);
+			if (member_type != 2)
+			{
+				if (member_type == 0)
+					_print_error("Not on channel", ":" + std::string(SERVERNAME) + " 442 " + cmd[1] + " :You're not on that channel\r\n", client_fd);
+				else if (member_type == -1)
+					_print_error("No such channel", ":" + std::string(SERVERNAME) + " 403 " + cmd[1] + " :No such channel\r\n", client_fd);
+				else
+					_print_error("Not channel operator", ":" + std::string(SERVERNAME) + " 482 " + cmd[1] + " :You're not channel operator\r\n", client_fd);
+				return ;
+			}
 			this->_cmd_invite(cmd[1], cmd[2], client_fd);
 		}
 		else
@@ -152,6 +152,20 @@ void    IRC::_interaction(std::string command, int client_fd)
 	}
 	else if (cmd[0] == "KICK")
 	{
+		if (cmd.size() >= 3)
+		{
+			int member_type = this->_channel_member_type(cmd[1], client_fd);
+			if (member_type != 2)
+			{
+				if (member_type == 0)
+					_print_error("Not on channel", ":" + std::string(SERVERNAME) + " 442 " + cmd[1] + " :You're not on that channel\r\n", client_fd);
+				else if (member_type == -1)
+					_print_error("No such channel", ":" + std::string(SERVERNAME) + " 403 " + cmd[1] + " :No such channel\r\n", client_fd);
+				else
+					_print_error("Not channel operator", ":" + std::string(SERVERNAME) + " 482 " + cmd[1] + " :You're not channel operator\r\n", client_fd);
+				return ;
+			}
+		}
 		if (cmd.size() == 3)
 		{
 			this->_cmd_kick(cmd[1], cmd[2], "", client_fd);
@@ -178,6 +192,17 @@ void    IRC::_interaction(std::string command, int client_fd)
     }
     else if (cmd[0] == "MODE")
     {
+		int member_type = this->_channel_member_type(cmd[1], client_fd);
+		if (member_type != 2)
+		{
+			if (member_type == 0)
+				_print_error("Not on channel", ":" + std::string(SERVERNAME) + " 442 " + cmd[1] + " :You're not on that channel\r\n", client_fd);
+			else if (member_type == -1)
+				_print_error("No such channel", ":" + std::string(SERVERNAME) + " 403 " + cmd[1] + " :No such channel\r\n", client_fd);
+			else
+				_print_error("Not channel operator", ":" + std::string(SERVERNAME) + " 482 " + cmd[1] + " :You're not channel operator\r\n", client_fd);
+			return ;
+		}
         if (cmd.size() == 3)
             this->_cmd_mode(cmd[1], cmd[2], client_fd);
         else if (cmd.size() == 4)
@@ -364,11 +389,6 @@ void    IRC::_cmd_invite(std::string nickname, std::string channel, int client_f
 	if (this->_nicknames.find(nickname) == this->_nicknames.end())
 	{
 		_print_error("No such nickname", ":" + std::string(SERVERNAME) + " 401 " + this->_clients[client_fd]->nickname + " " + nickname + " :No such nickname\r\n", client_fd);
-		return ;
-	}
-	else if (this->_channels.find(channel) == this->_channels.end())
-	{
-		_print_error("No such channel", ":" + std::string(SERVERNAME) + " 403 " + this->_clients[client_fd]->nickname + " " + channel + " :No such channel\r\n", client_fd);
 		return ;
 	}
 	//check if nickname is already in channel
