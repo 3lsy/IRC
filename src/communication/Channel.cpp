@@ -103,6 +103,12 @@ bool Channel::join(Client *client) {
 			_print_error("Cannot join channel (+i)", ":" + std::string(SERVERNAME) + " 473 " + this->_name + " :Cannot join channel (+i)\r\n", client->fd);
             return (false);
         }
+        else
+        {
+            this->_invited.erase(client->nickname);
+            std::cout << BLUE << "SERVER: " << client->nickname << " is now a member of " << this->_name << RESET << std::endl;
+            std::cout << BLUE << "SERVER: " << client->nickname << " is no longer invited to " << this->_name << RESET << std::endl;
+        }
     }
     // if channel is full (user_limit), reject client
     if (this->user_limit > 0 && this->_members.size() >= static_cast<size_t>(this->user_limit))
@@ -141,11 +147,6 @@ bool Channel::join(Client *client, std::string password) {
     if (this->invite_only)
     {
         // Check that the client nick is in the _invited list
-        std::cout << "Invited list: ";
-        for (std::map<std::string, Client *>::iterator it = this->_invited.begin(); it != this->_invited.end(); it++)
-            std::cout << it->first << " ";
-        std::cout << std::endl;
-
         if (this->_invited.find(client->nickname) == this->_invited.end())
         {
 			_print_error("Cannot join channel (+i)", ":" + std::string(SERVERNAME) + " 473 " + this->_name + " :Cannot join channel (+i)\r\n", client->fd);
