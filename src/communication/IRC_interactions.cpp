@@ -465,22 +465,16 @@ void    IRC::_cmd_kick(std::string channel, std::string nickname, std::string co
 	std::map<std::string, Client *> members = this->_channels[channel]->get_members();
 	std::map<std::string, Client *> operators = this->_channels[channel]->get_operators();
 
-	//check if nickname and channel exists
+	//check if nickname exists
 	if (this->_nicknames.find(nickname) == this->_nicknames.end())
 	{
 		_print_error("No such nickname", ":" + std::string(SERVERNAME) + " 401 " + this->_clients[client_fd]->nickname + " " + nickname + " :No such nickname\r\n", client_fd);
 		return ;
 	}
-	//check if channel exists
-	else if (this->_channels.find(channel) == this->_channels.end())
+	//check if nickname isn't the same as the client
+	if (this->_clients[client_fd]->nickname == nickname)
 	{
-		_print_error("No such channel", ":" + std::string(SERVERNAME) + " 403 " + this->_clients[client_fd]->nickname + " " + channel + " :No such channel\r\n", client_fd);
-		return ;
-	}
-	//check if nickname is not in channel
-	else if (members.find(nickname) == members.end())
-	{
-		_print_error("Not in channel", ":" + std::string(SERVERNAME) + " 441 " + this->_clients[client_fd]->nickname + " " + nickname + " " + channel + " :They aren't on that channel\r\n", client_fd);
+		_print_error("Cannot kick yourself", ":" + std::string(SERVERNAME) + " 482 " + this->_clients[client_fd]->nickname + " " + channel + " :Cannot kick yourself\r\n", client_fd);
 		return ;
 	}
 	//kick the user
