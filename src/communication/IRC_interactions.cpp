@@ -483,9 +483,8 @@ void    IRC::_cmd_kick(std::string channel, std::string nickname, std::string co
 		_print_error("Not in channel", ":" + std::string(SERVERNAME) + " 441 " + this->_clients[client_fd]->nickname + " " + nickname + " " + channel + " :They aren't on that channel\r\n", client_fd);
 		return ;
 	}
-	// _print_message("Kicking " + nickname + " from " + channel, ":" + this->_clients[client_fd]->nickname + " KICK " + channel + " " + nickname + " :" + comment + "\r\n", client_fd);
 	//kick the user
-	std::string kick_comment = comment.empty() ? nickname + "has been kicked from the channel" : comment;
+	std::string kick_comment = comment.empty() ? ":" + nickname + " has been kicked from the channel" : comment;
 	std::string kick_msg = ":" + this->_clients[client_fd]->nickname + " KICK " + channel + " " + nickname + " " + kick_comment + "\r\n";
 
 	//send kick message to all members
