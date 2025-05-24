@@ -252,6 +252,7 @@ void    IRC::_cmd_join(std::string channels, std::string passwords, int client_f
     std::vector<std::string> chans = split_by(channels, ',');
     std::vector<std::string> pass = split_by(passwords, ',');
 	
+	std::cout << BLUE << "SERVER: chans.size() = " << chans.size() << ", pass.size() = " << pass.size() << RESET << std::endl;
 	if (pass.size() > 0 && chans.size() != pass.size())
 	{
 		_print_error("Invalid JOIN command", ":" + std::string(SERVERNAME) + " 461 JOIN :Not enough parameters\r\n", client_fd);
