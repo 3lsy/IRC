@@ -83,7 +83,7 @@ int IRC::_channel_member_type(std::string channel, int client_fd)
  * KICK: <channel> <nickname> [<comment>]
  * MODE: <channel> [<mode> [<mode params>]]
  * 
- * PRIVMSG: <target> <text to be sent>
+ * PRIVMSG: <nickname> <text to be sent>
  * INVITE: <nickname> <channel>
  * NICK: <nickname>
  * 
