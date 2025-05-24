@@ -97,8 +97,8 @@ bool Channel::join(Client *client) {
     // if channel is invite only, check if client is invited
     if (this->invite_only)
     {
-        // Check that the client nick is in the _invited list
-        if (this->_invited.find(client->nickname) == this->_invited.end())
+        // Check that the client nick is in the _invited list or the member list
+        if (this->_invited.find(client->nickname) == this->_invited.end() && this->_members.find(client->nickname) == this->_members.end())
         {
 			_print_error("Cannot join channel (+i)", ":" + std::string(SERVERNAME) + " 473 " + this->_name + " :Cannot join channel (+i)\r\n", client->fd);
             return (false);
@@ -142,12 +142,12 @@ bool Channel::join(Client *client, std::string password) {
 		_print_error("Cannot join channel (+k)", ":" + std::string(SERVERNAME) + " 475 " + this->_name + " :Cannot join channel (+k)\r\n", client->fd);
         return (false);
     }
-    std::cout << RED << "invite_only: " << (this->invite_only ? "true" : "false") << RESET << std::endl;
+    std::cout << BLUE << "SERVER: invite_only: " << (this->invite_only ? "true" : "false") << RESET << std::endl;
     // if channel is invite only, check if client is invited
     if (this->invite_only)
     {
-        // Check that the client nick is in the _invited list
-        if (this->_invited.find(client->nickname) == this->_invited.end())
+        // Check that the client nick is in the _invited list or the member list
+        if (this->_invited.find(client->nickname) == this->_invited.end() && this->_members.find(client->nickname) == this->_members.end())
         {
 			_print_error("Cannot join channel (+i)", ":" + std::string(SERVERNAME) + " 473 " + this->_name + " :Cannot join channel (+i)\r\n", client->fd);
             return (false);
