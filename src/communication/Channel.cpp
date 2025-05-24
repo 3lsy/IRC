@@ -73,6 +73,34 @@ void    Channel::broadcast(std::string message)
     }
 }
 
+void   Channel::update_member(std::string old_nickname, std::string new_nickname) {
+    // Update the member's nickname in the channel
+    if (this->_members.find(old_nickname) != this->_members.end()) {
+        Client *client = this->_members[old_nickname];
+        this->_members.erase(old_nickname);
+        this->_members[new_nickname] = client;
+        std::cout << BLUE << "SERVER: " << old_nickname << " changed nickname to " << new_nickname << " in channel " << this->_name << RESET << std::endl;
+    }
+    // Update the operator's nickname in the channel
+    if (this->_operators.find(old_nickname) != this->_operators.end()) {
+        Client *client = this->_operators[old_nickname];
+        this->_operators.erase(old_nickname);
+        this->_operators[new_nickname] = client;
+        std::cout << BLUE << "SERVER: " << old_nickname << " changed nickname to " << new_nickname << " as operator in channel " << this->_name << RESET << std::endl;
+    }
+    // Update the invited list
+    if (this->_invited.find(old_nickname) != this->_invited.end()) {
+        Client *client = this->_invited[old_nickname];
+        this->_invited.erase(old_nickname);
+        this->_invited[new_nickname] = client;
+        std::cout << BLUE << "SERVER: " << old_nickname << " changed nickname to " << new_nickname << " in invited list of channel " << this->_name << RESET << std::endl;
+    }
+    // Broadcast the nickname change to all members
+    std::string message = ":" + old_nickname + " NICK :" + new_nickname + "\r\n";
+    this->broadcast(message);
+    std::cout << BLUE << "SERVER: Broadcasted nickname change from " << old_nickname << " to " << new_nickname << " in channel " << this->_name << RESET << std::endl;
+}
+
 /**
  * @brief Sends a message to all members of the channel
  * 
