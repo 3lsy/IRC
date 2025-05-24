@@ -282,10 +282,11 @@ void    IRC::_cmd_join(std::string channels, std::string passwords, int client_f
 			channel_created = true;
         }
         std::cout << BLUE << "SERVER: JOIN " << chans[i] << RESET << std::endl;
+		bool joined = false;
         if (pass.size() <= i)
-            this->_channels[chans[i]]->join(this->_clients[client_fd]);
+            joined = this->_channels[chans[i]]->join(this->_clients[client_fd]);
         else
-            this->_channels[chans[i]]->join(this->_clients[client_fd], pass[i]);
+            joined = this->_channels[chans[i]]->join(this->_clients[client_fd], pass[i]);
 		
 		// After joining the channel
 		// Make the client an operator if the channel was just created
@@ -298,7 +299,7 @@ void    IRC::_cmd_join(std::string channels, std::string passwords, int client_f
 				chans[i] + " +o " + this->_clients[client_fd]->nickname + "\r\n");
 		}
 		// Send the channel topic to the client if successfuly joined
-		if (this->_channel_member_type(chans[i], client_fd) > 0)
+		if (joined && this->_channel_member_type(chans[i], client_fd) > 0)
 			this->_channels[chans[i]]->get_topic(this->_clients[client_fd]);
     }
 }
