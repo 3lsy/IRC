@@ -357,10 +357,21 @@ void    Channel::change_mode(Client *client, std::string mode, std::string arg)
         }
         else if (mode[1] == 'l')
         {
+            // arg size must be between 1 and 4 characters (error 696)
+            if (arg.empty() || arg.length() > 4)
+            {
+                _print_error("Invalid number format", ":" + std::string(SERVERNAME) + " 696 " + _name + " " + mode + " :Limit must be a positive integer below 10,000\r\n", client->fd);
+                return;
+            }
             int limit = std::atoi(arg.c_str());
-            if (arg.empty() || (limit == 0 && arg != "0"))
+            if (limit == 0 && arg != "0")
 				_print_error("Invalid number format", ":" + std::string(SERVERNAME) + " 461 " + _name + " " + mode + " :Not enough parameters", client->fd);
-            else
+            else if (limit <= 0 || limit > 9999)
+            {
+                _print_error("Invalid number format", ":" + std::string(SERVERNAME) + " 696 " + _name + " " + mode + " :Limit must be a positive integer below 10,000\r\n", client->fd);
+                return;
+            }
+            else 
 			{
                 user_limit = limit;
 				this->broadcast(":" + client->nickname + "!" + client->username + "@" + client->hostname + " MODE " + this->_name + " +l " + arg + "\r\n");
@@ -449,6 +460,23 @@ std::string Channel::get_name(void) {
 
 bool Channel::get_invite_only(void) {
 	return (this->invite_only);
+}
+
+std::string Channel::get_mode(void) {
+    std::string mode = "+";
+    if (this->invite_only)
+        mode += "i";
+    if (this->topic_locked)
+        mode += "t";
+    if (this->key_password)
+        mode += "k";
+    if (this->user_limit > 0)
+    {
+        std::ostringstream oss;
+        oss << "l " << this->user_limit;
+        mode += oss.str();
+    }
+    return mode;
 }
 
 void Channel::remove_member(std::string nickname) {

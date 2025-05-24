@@ -64,6 +64,7 @@ class Channel {
 		std::map<std::string, Client *> &get_invited(void);
 		std::string						get_name(void);
 		bool							get_invite_only(void);
+		std::string						get_mode(void);
 };
 
 #endif

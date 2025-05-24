@@ -57,6 +57,7 @@ private:
 	void				_cmd_kick(std::string channel, std::string nickname, std::string comment, int client_fd);
     void                _cmd_topic(std::string channel, std::string topic, int client_fd);
     void                _cmd_topic(std::string channel, int client_fd);
+	void				_cmd_mode(std::string target, int client_fd);
     void                _cmd_mode(std::string channel, std::string mode, int client_fd);
     void                _cmd_mode(std::string channel, std::string mode, std::string arg, int client_fd);
 	void				_cmd_nick(std::string nickname, int client_fd);

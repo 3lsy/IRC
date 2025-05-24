@@ -212,13 +212,20 @@ void    IRC::_interaction(std::string command, int client_fd)
 			else if (member_type == -1)
 				_print_error("No such channel", ":" + std::string(SERVERNAME) + " 403 " + cmd[1] + " :No such channel\r\n", client_fd);
 			else
-				_print_error("Not channel operator", ":" + std::string(SERVERNAME) + " 482 " + cmd[1] + " :You're not channel operator\r\n", client_fd);
+			{
+				if (cmd.size() == 2)
+					this->_cmd_mode(cmd[1], client_fd);
+				else
+					_print_error("Not channel operator", ":" + std::string(SERVERNAME) + " 482 " + cmd[1] + " :You're not channel operator\r\n", client_fd);
+			}
 			return ;
 		}
         if (cmd.size() == 3)
             this->_cmd_mode(cmd[1], cmd[2], client_fd);
         else if (cmd.size() == 4)
             this->_cmd_mode(cmd[1], cmd[2], cmd[3], client_fd);
+		else if (cmd.size() == 2)
+			this->_cmd_mode(cmd[1], client_fd);
 		else
 			_print_error("Incorrect number of parameters", ":" + std::string(SERVERNAME) + " 461 " + cmd[1] + " " + cmd[0] + " :Incorrect number of parameters\r\n", client_fd);
 		return ;
@@ -554,6 +561,30 @@ void    IRC::_cmd_topic(std::string channel, int client_fd)
     }
 }
 
+
+/**
+ * @brief Handles the mode process for the client
+ * 
+ * @param target The target of the mode change
+ * @param client_fd The file descriptor of the client
+ * 
+ * @note Client format message: :<nickname>!<username>@<hostname> MODE <target>
+ * @note Server format message: :<servername> 482 <target> :You're not channel operator
+ */
+void    IRC::_cmd_mode(std::string target, int client_fd)
+{
+	if (this->_channels.find(target) != this->_channels.end())
+	{
+		std::string mode = this->_channels[target]->get_mode();
+		std::string response = ":" + std::string(SERVERNAME) + " 324 " + target + " " + mode + "\r\n";
+		_print_message("Sending channel mode", response, client_fd);
+	}
+	else
+	{
+		_print_error("No such channel", ":" + std::string(SERVERNAME) + " 403 " + target + " :No such channel\r\n", client_fd);
+	}
+
+}
 
 /**
  * @brief Handles the mode process for the client
