@@ -468,7 +468,13 @@ void	IRC::_cmd_nick(std::string nickname, int client_fd)
     std::string old_nick = client->nickname;
 
     client->nickname = nickname;
+	// Update the client's nickname
     this->_nicknames[nickname] = client_fd;
+	this->_nicknames.erase(old_nick);
+	// Update the client's nickname in the channels using Channel's method update_member()
+	for (std::map<std::string, Channel *>::iterator it = this->_channels.begin(); it != this->_channels.end(); ++it) {
+		it->second->update_member(old_nick, nickname);
+	}
 
     // Required NICK message for IRC clients to update
     std::string nick_msg = ":" +  old_nick + " NICK :" + nickname + "\r\n";

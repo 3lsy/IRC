@@ -47,6 +47,7 @@ class Channel {
 		Channel& operator=(const Channel &other);
 		Channel(const Channel &other);
 		~Channel();
+		void					update_member(std::string old_nickname, std::string new_nickname);
 		void	                broadcast(std::string message);
 		bool					join(Client *client);
 		bool					join(Client *client, std::string password);
