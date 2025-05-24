@@ -86,6 +86,12 @@ void    Channel::broadcast(std::string message)
  * - :<servername> 475 <nickname> <channel> :Cannot join channel (+k)
  */
 bool Channel::join(Client *client) {
+    // if already a member, return false
+    if (this->_members.find(client->nickname) != this->_members.end())
+    {
+        _print_error("Already a member", ":" + std::string(SERVERNAME) + " 443 " + this->_name + " :Already a member\r\n", client->fd);
+        return (false);
+    }
     // if channel is password protected, check if client has password
     if (this->key_password)
     {
@@ -134,6 +140,12 @@ bool Channel::join(Client *client) {
  * - :<servername> 475 <nickname> <channel> :Cannot join channel (+k)
  */
 bool Channel::join(Client *client, std::string password) {
+    // if already a member, return false
+    if (this->_members.find(client->nickname) != this->_members.end())
+    {
+        _print_error("Already a member", ":" + std::string(SERVERNAME) + " 443 " + this->_name + " :Already a member\r\n", client->fd);
+        return (false);
+    }
     // if channel is password protected, check if client has password
     if (this->key_password && password != this->_password)
     {
