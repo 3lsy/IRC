@@ -237,7 +237,12 @@ void    Channel::change_mode(Client *client, std::string mode)
         _print_error("Invalid mode syntax", ":" + std::string(SERVERNAME) + " 472 " + _name + " " + mode_without_sign + " :is unknown mode to me\r\n", client->fd);
         return;
     }
-    if (mode[1] != 'i' && mode[1] != 't')
+    if (mode[1] == 'o' || mode[1] == 'k')
+    {
+        _print_error("Invalid mode syntax", ":" + std::string(SERVERNAME) + " 461 " + _name + " " + mode + " :Not enough parameters\r\n", client->fd);
+        return;
+    }
+    else if (mode[1] != 'i' && mode[1] != 't' && mode[1] != 'l')
     {
         _print_error("Invalid mode syntax", ":" + std::string(SERVERNAME) + " 472 " + _name + " " + mode.substr(1) + " :is unknown mode to me\r\n", client->fd);
         return;
@@ -256,6 +261,11 @@ void    Channel::change_mode(Client *client, std::string mode)
 			this->broadcast(":" + client->nickname + "!" + client->username + "@" + client->hostname + " MODE " + this->_name + " +t\r\n");
 			std::cout << BLUE << "SERVER: Channel topic is now locked" << RESET << std::endl;
 		}
+        else if (mode[1] == 'l')
+        {
+            _print_error("Invalid number format", ":" + std::string(SERVERNAME) + " 461 " + _name  + " " + mode + " :Not enough parameters\r\n", client->fd);
+            return;
+        }
     }
     else if (mode[0] == '-')
     {
@@ -265,6 +275,12 @@ void    Channel::change_mode(Client *client, std::string mode)
 			this->broadcast(":" + client->nickname + "!" + client->username + "@" + client->hostname + " MODE " + this->_name + " -i\r\n");
 			std::cout << BLUE << "SERVER: Channel is no longer invite only" << RESET << std::endl;
 		}
+        else if (mode[1] == 'l')
+        {
+            this->user_limit = 0;
+			this->broadcast(":" + client->nickname + "!" + client->username + "@" + client->hostname + " MODE " + this->_name + " -l\r\n");
+			std::cout << BLUE << "SERVER: Channel user limit is now 0" << RESET << std::endl;
+        }
         else if (mode[1] == 't')
 		{
             this->topic_locked = false;
@@ -292,7 +308,12 @@ void    Channel::change_mode(Client *client, std::string mode, std::string arg)
         _print_error("Invalid mode syntax", ":" + std::string(SERVERNAME) + " 472 " + _name + " " + mode_without_sign + " :is unknown mode to me\r\n", client->fd);
         return;
     }
-    if (mode[1] != 'k' && mode[1] != 'l' && mode[1] != 'o')
+    if (mode[1] == 'i' || mode[1] == 't')
+    {
+        _print_error("Invalid mode syntax", ":" + std::string(SERVERNAME) + " 461 " + _name + " " + mode + " :Accepts no parameters\r\n", client->fd);
+        return;
+    }
+    else if (mode[1] != 'k' && mode[1] != 'l' && mode[1] != 'o')
     {
         _print_error("Invalid mode syntax", ":" + std::string(SERVERNAME) + " 472 " + _name + " " + mode.substr(1) + " " + arg + " :is unknown mode to me\r\n", client->fd);
         return;
@@ -310,7 +331,7 @@ void    Channel::change_mode(Client *client, std::string mode, std::string arg)
         {
             int limit = std::atoi(arg.c_str());
             if (arg.empty() || (limit == 0 && arg != "0"))
-				_print_error("Invalid number format", ":" + std::string(SERVERNAME) + " 461 " + _name + " :Not enough parameters", client->fd);
+				_print_error("Invalid number format", ":" + std::string(SERVERNAME) + " 461 " + _name + " " + mode + " :Not enough parameters", client->fd);
             else
 			{
                 user_limit = limit;
@@ -341,9 +362,8 @@ void    Channel::change_mode(Client *client, std::string mode, std::string arg)
         }
         else if (mode[1] == 'l')
         {
-            this->user_limit = 0;
-			this->broadcast(":" + client->nickname + "!" + client->username + "@" + client->hostname + " MODE " + this->_name + " -l\r\n");
-			std::cout << BLUE << "SERVER: Channel user limit is now 0" << RESET << std::endl;
+            // -l doesn't require an argument
+            _print_error("Invalid number format", ":" + std::string(SERVERNAME) + " 461 " + _name + " " + mode + " :Accepts no parameters\r\n", client->fd);
         }
 		else if (mode[1] == 'o')
 		{
