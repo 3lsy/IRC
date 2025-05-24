@@ -315,7 +315,10 @@ void    IRC::_cmd_join(std::string channels, std::string passwords, int client_f
 		}
 		// Send the channel topic to the client if successfuly joined
 		if (joined && this->_channel_member_type(chans[i], client_fd) > 0)
+		{
 			this->_channels[chans[i]]->get_topic(this->_clients[client_fd]);
+			this->_channels[chans[i]]->print_members(this->_clients[client_fd]);
+		}
     }
 }
 

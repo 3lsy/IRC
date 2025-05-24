@@ -379,6 +379,29 @@ void    Channel::change_mode(Client *client, std::string mode, std::string arg)
     }
 }
 
+/**
+ * @brief Prints all members of the channel to the given client
+ * 
+ * @param client The client to send the member list to
+ */
+void Channel::print_members(Client *client) {
+    std::string member_list;
+    for (std::map<std::string, Client *>::iterator it = this->_members.begin(); it != this->_members.end(); ++it) {
+        if (!member_list.empty())
+            member_list += " ";
+        // Prefix with @ if operator
+        if (this->_operators.find(it->first) != this->_operators.end())
+            member_list += "@";
+        member_list += it->first;
+    }
+    std::string message = ":" + std::string(SERVERNAME) + " 353 " + client->nickname + " = " + this->_name + " :" + member_list + "\r\n";
+    _print_message("Sending member list to " + client->nickname, message, client->fd);
+    // End of names list
+    std::string end_message = ":" + std::string(SERVERNAME) + " 366 " + client->nickname + " " + this->_name + " :End of /NAMES list\r\n";
+    _print_message("End of member list for " + client->nickname, end_message, client->fd);
+}
+
+
 // setters and getters
 std::map<std::string, Client *> Channel::get_members(void) {
 	return (this->_members);

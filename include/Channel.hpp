@@ -57,6 +57,7 @@ class Channel {
         void					change_mode(Client *client, std::string mode, std::string arg);
 		void					remove_member(std::string nickname);
 		// setters and getters
+		void							print_members(Client *client);
 		std::map<std::string, Client *> get_members(void);
 		std::map<std::string, Client *> get_operators(void);
 		std::map<std::string, Client *> &get_invited(void);
