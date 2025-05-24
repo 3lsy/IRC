@@ -234,7 +234,7 @@ void    Channel::change_mode(Client *client, std::string mode)
     if (mode.length() != 2 || (mode[0] != '+' && mode[0] != '-'))
     {
         std::string mode_without_sign = (mode.length() > 1) ? mode.substr(1) : mode;
-        _print_error("Invalid mode syntax", ":" + std::string(SERVERNAME) + " 472 " + _name + " " + mode_without_sign + " :is unknown mode to me\r\n", client->fd);
+        _print_error("Invalid mode syntax", ":" + std::string(SERVERNAME) + " 472 " + _name + " " + mode_without_sign + " :is unknown mode\r\n", client->fd);
         return;
     }
     if (mode[1] == 'o' || mode[1] == 'k')
@@ -244,7 +244,7 @@ void    Channel::change_mode(Client *client, std::string mode)
     }
     else if (mode[1] != 'i' && mode[1] != 't' && mode[1] != 'l')
     {
-        _print_error("Invalid mode syntax", ":" + std::string(SERVERNAME) + " 472 " + _name + " " + mode.substr(1) + " :is unknown mode to me\r\n", client->fd);
+        _print_error("Invalid mode syntax", ":" + std::string(SERVERNAME) + " 472 " + _name + " " + mode.substr(1) + " :is unknown mode\r\n", client->fd);
         return;
     }
     if (mode[0] == '+')
@@ -305,7 +305,7 @@ void    Channel::change_mode(Client *client, std::string mode, std::string arg)
     if (mode.length() != 2 || (mode[0] != '+' && mode[0] != '-'))
     {
         std::string mode_without_sign = (mode.length() > 1) ? mode.substr(1) : mode;
-        _print_error("Invalid mode syntax", ":" + std::string(SERVERNAME) + " 472 " + _name + " " + mode_without_sign + " :is unknown mode to me\r\n", client->fd);
+        _print_error("Invalid mode syntax", ":" + std::string(SERVERNAME) + " 472 " + _name + " " + mode_without_sign + " :is unknown mode\r\n", client->fd);
         return;
     }
     if (mode[1] == 'i' || mode[1] == 't')
@@ -315,7 +315,7 @@ void    Channel::change_mode(Client *client, std::string mode, std::string arg)
     }
     else if (mode[1] != 'k' && mode[1] != 'l' && mode[1] != 'o')
     {
-        _print_error("Invalid mode syntax", ":" + std::string(SERVERNAME) + " 472 " + _name + " " + mode.substr(1) + " " + arg + " :is unknown mode to me\r\n", client->fd);
+        _print_error("Invalid mode syntax", ":" + std::string(SERVERNAME) + " 472 " + _name + " " + mode.substr(1) + " " + arg + " :is unknown mode\r\n", client->fd);
         return;
     }
     if (mode[0] == '+')

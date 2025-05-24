@@ -77,6 +77,16 @@ int IRC::_channel_member_type(std::string channel, int client_fd)
  * 
  * @note handled commands: PRIVMSG, JOIN, TOPIC, KICK, MODE, INVITE, QUIT
  * @note Ignore unhandled commands (e.g. PING, PONG, CAP, etc.)
+ * 
+ * JOIN: <channel[,channel,...]> [<key>[,<key>,...]]
+ * TOPIC: <channel> [<topic>]
+ * KICK: <channel> <nickname> [<comment>]
+ * MODE: <channel> [<mode> [<mode params>]]
+ * 
+ * PRIVMSG: <target> <text to be sent>
+ * INVITE: <nickname> <channel>
+ * NICK: <nickname>
+ * 
  */
 void    IRC::_interaction(std::string command, int client_fd)
 {
@@ -86,13 +96,10 @@ void    IRC::_interaction(std::string command, int client_fd)
         return ;
 	}
 	
-	if (cmd[0] == "MODE" || cmd[0] == "INVITE" || cmd[0] == "KICK")
+	if ((cmd.size() < 2) && (cmd[0] == "MODE" || cmd[0] == "INVITE" || cmd[0] == "KICK" || cmd[0] == "TOPIC" || cmd[0] == "JOIN"))
 	{
-		if (cmd.size() < 2)
-		{
-			_print_error("Incorrect command", ":" + std::string(SERVERNAME) + " 461 " + cmd[0] + " :Not enough parameters\r\n", client_fd);
-			return ;
-		}
+		_print_error("Incorrect command", ":" + std::string(SERVERNAME) + " 461 " + cmd[0] + " :Not enough parameters\r\n", client_fd);
+		return ;
 	}
 
     if (cmd[0] == "JOIN")
@@ -101,8 +108,9 @@ void    IRC::_interaction(std::string command, int client_fd)
             this->_cmd_join(cmd[1], "", client_fd);
         else if (cmd.size() == 3)
             this->_cmd_join(cmd[1], cmd[2], client_fd);
-        else
-            return ;
+		else if (cmd.size() > 3)
+			_print_error("Too many parameters", ":" + std::string(SERVERNAME) + " 461 " + cmd[1] + " " + cmd[0] + " :Too many parameters\r\n", client_fd);
+		return ;
     }
 	else if (cmd[0] == "PRIVMSG")
 	{
@@ -138,21 +146,26 @@ void    IRC::_interaction(std::string command, int client_fd)
 				this->_cmd_invite(cmd[1], cmd[2], client_fd);
 		}
 		else
-			return ;	
+			_print_error("Incorrect number of parameters", ":" + std::string(SERVERNAME) + " 461 " + cmd[0] + " :Incorrect number of parameters\r\n", client_fd);
+		return ;	
 	}
 	else if (cmd[0] == "NICK")
 	{
-		if (cmd.size() >= 2 && !cmd[1].empty())
+		if (cmd.size() == 2)
 		{
 			this->_cmd_nick(cmd[1], client_fd);
 		}
-		else {
+		else
 			_print_error("Incorrect NICK command", ":" + std::string(SERVERNAME) + " 431 * :No nickname given\r\n", client_fd);
-			return ;
-		} ;
+		return ;
 	}
 	else if (cmd[0] == "KICK")
 	{
+		if (cmd.size() < 3)
+		{
+			_print_error("Incorrect KICK command", ":" + std::string(SERVERNAME) + " 461 KICK :Not enough parameters\r\n", client_fd);
+			return ;
+		}
 		if (cmd.size() >= 3)
 		{
 			int member_type = this->_channel_member_type(cmd[1], client_fd);
@@ -176,8 +189,7 @@ void    IRC::_interaction(std::string command, int client_fd)
 			std::string comment = command.substr(command.find(cmd[3]));
 			this->_cmd_kick(cmd[1], cmd[2], comment, client_fd);
 		}
-		else
-			return ;
+		return ;
 	}
     else if (cmd[0] == "TOPIC")
     {
@@ -188,8 +200,7 @@ void    IRC::_interaction(std::string command, int client_fd)
         }
         else if (cmd.size() == 2)
             this->_cmd_topic(cmd[1], client_fd);
-        else
-            return ;
+		return ;
     }
     else if (cmd[0] == "MODE")
     {
@@ -209,7 +220,8 @@ void    IRC::_interaction(std::string command, int client_fd)
         else if (cmd.size() == 4)
             this->_cmd_mode(cmd[1], cmd[2], cmd[3], client_fd);
 		else
-			return ;
+			_print_error("Incorrect number of parameters", ":" + std::string(SERVERNAME) + " 461 " + cmd[1] + " " + cmd[0] + " :Incorrect number of parameters\r\n", client_fd);
+		return ;
     }
     else if (cmd[0] == "PING")
     {
