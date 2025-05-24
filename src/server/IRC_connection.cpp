@@ -42,8 +42,6 @@ void IRC::_new_connection(void)
 /**
  * @brief This function reads from the client and sends a response back
  * 
- * @todo Correct: errno = "Connection reset by peer" when client disconnects (recv returns -1)
- * 
  * @param fd The file descriptor of the client
  * 
  * @note Client format messages: :<nickname>!<username>@<hostname> PRIVMSG <target> :<message>
@@ -68,7 +66,6 @@ void    IRC::_read_client_message(int fd)
 /**
  * @brief This function reads from the client and sends a response back
  * 
- * @todo Correct: errno = "Connection reset by peer" when client disconnects (recv returns -1)
  */
 void	IRC::_read_from_client(int fd)
 {

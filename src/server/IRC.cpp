@@ -52,10 +52,16 @@ IRC::IRC(int port, std::string password):
 IRC::~IRC(void) {
 	std::cout << BLUE << "SERVER: IRC server shutting down" << RESET << std::endl;
 
+	// Clean up clients
 	for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
 		delete it->second;
 	}
 	_clients.clear();
+	// Clean up channels
+	for (std::map<std::string, Channel *>::iterator it = _channels.begin(); it != _channels.end(); ++it) {
+		delete it->second;
+	}
+	_channels.clear();
 	if (this->_socket_fd >= 0) {
 		close(this->_socket_fd);
 		std::cout << BLUE << "SERVER: Server socket closed" << RESET << std::endl;

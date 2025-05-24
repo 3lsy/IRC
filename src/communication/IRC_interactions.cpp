@@ -245,7 +245,6 @@ void    IRC::_interaction(std::string command, int client_fd)
  * @param passwords The passwords for the channels
  * @param client_fd The file descriptor of the client
  * 
- * @todo Delete the channel in the destructor
  */
 void    IRC::_cmd_join(std::string channels, std::string passwords, int client_fd)
 {
