@@ -66,11 +66,9 @@ void    Channel::broadcast(std::string message)
         {
             std::cerr << RED << "SERVER: Error sending message to client " << it->second->nickname << RESET << std::endl;
         }
-        std::cout << YELLOW << "SERVER{";
+        std::cout << YELLOW << "SERVER{" + it->second->fd;
         if (!it->second->nickname.empty())
             std::cout << it->second->nickname;
-        else
-            std::cout << it->second->fd;
         std::cout << "}: " << message << RESET;
     }
 }
