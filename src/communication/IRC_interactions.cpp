@@ -265,6 +265,7 @@ void    IRC::_cmd_join(std::string channels, std::string passwords, int client_f
     }
     for (size_t i = 0; i < chans.size(); i++)
     {
+		bool channel_created = false;
         if (this->_channels.find(chans[i]) == this->_channels.end())
         {
             // Channel does not exist, create it
@@ -278,12 +279,24 @@ void    IRC::_cmd_join(std::string channels, std::string passwords, int client_f
                 Channel *new_channel = new Channel(chans[i], pass[i], this->_clients[client_fd]);
                 this->_channels[chans[i]] = new_channel;
             }
+			channel_created = true;
         }
         std::cout << BLUE << "SERVER: JOIN " << chans[i] << RESET << std::endl;
         if (pass.size() <= i)
             this->_channels[chans[i]]->join(this->_clients[client_fd]);
         else
             this->_channels[chans[i]]->join(this->_clients[client_fd], pass[i]);
+		
+		// After joining the channel
+		// Make the client an operator if the channel was just created
+		if (channel_created)
+		{
+			this->_channels[chans[i]]->broadcast(
+				":" + this->_clients[client_fd]->nickname + '!' +
+				this->_clients[client_fd]->username + '@' +
+				this->_clients[client_fd]->hostname + " MODE " +
+				chans[i] + " +o " + this->_clients[client_fd]->nickname + "\r\n");
+		}
 		// Send the channel topic to the client if successfuly joined
 		if (this->_channel_member_type(chans[i], client_fd) > 0)
 			this->_channels[chans[i]]->get_topic(this->_clients[client_fd]);
