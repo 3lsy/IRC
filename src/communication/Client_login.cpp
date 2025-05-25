@@ -52,7 +52,7 @@ std::vector<std::string>    split_by(const std::string& str, char delim)
  * @note Ignore unhandled commands (e.g. PING, PONG, CAP, etc.)
  * @note Client welcome message: :<servername> 001 <nickname> :Welcome to the Internet Relay Network <nickname>!<username>@<hostname>
  */
-bool Client::login(std::string command, std::map<std::string, int> nicknames)
+bool Client::login(std::string command, std::map<std::string, int> nicknames, std::map<std::string, Channel*> channels)
 {
     bool    success;
 
@@ -106,6 +106,19 @@ bool Client::login(std::string command, std::map<std::string, int> nicknames)
             std::cerr << RED << "SERVER: Error sending welcome message to client" << RESET << std::endl;
         }
         this->logged_in = true;
+        // Update every channel's member and operator list with this client
+        for (std::map<std::string, Channel *>::iterator it = channels.begin(); it != channels.end(); ++it) {
+            if (it->second->get_members().find(this->nickname) != it->second->get_members().end()) {
+                it->second->get_members()[this->nickname] = this;
+                this->_channels[it->second->get_name()] = it->second;
+                _print_message("Sending JOIN message to client", ":" + this->nickname + "!" + this->username + "@" + this->hostname + " JOIN :" + it->second->get_name() + "\r\n", this->fd);
+            }
+            if (it->second->get_operators().find(this->nickname) != it->second->get_operators().end()) {
+                it->second->get_operators()[this->nickname] = this;
+                std::string modeMessage = ":" + this->nickname + "!" + this->username + "@" + this->hostname + " MODE " + it->second->get_name() + " +o " + this->nickname + "\r\n";
+                _print_message("Sending MODE +o message to client", modeMessage, this->fd);
+            }
+        }
     }
     return (success);
 }

@@ -59,8 +59,8 @@ class Channel {
 		void					remove_member(std::string nickname);
 		// setters and getters
 		void							print_members(Client *client);
-		std::map<std::string, Client *> get_members(void);
-		std::map<std::string, Client *> get_operators(void);
+		std::map<std::string, Client *> &get_members(void);
+		std::map<std::string, Client *> &get_operators(void);
 		std::map<std::string, Client *> &get_invited(void);
 		std::string						get_name(void);
 		bool							get_invite_only(void);

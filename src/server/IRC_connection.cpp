@@ -51,7 +51,7 @@ void    IRC::_read_client_message(int fd)
 {
     if (!this->_clients[fd]->logged_in)
     {
-        if (this->_clients[fd]->login(this->_buffer, this->_nicknames) == false)
+        if (this->_clients[fd]->login(this->_buffer, this->_nicknames, this->_channels) == false)
         {
             this->remove_client(fd);
             return ;

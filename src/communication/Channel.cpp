@@ -442,11 +442,11 @@ void Channel::print_members(Client *client) {
 
 
 // setters and getters
-std::map<std::string, Client *> Channel::get_members(void) {
+std::map<std::string, Client *> &Channel::get_members(void) {
 	return (this->_members);
 }
 
-std::map<std::string, Client *> Channel::get_operators(void) {
+std::map<std::string, Client *> &Channel::get_operators(void) {
 	return (this->_operators);
 }
 

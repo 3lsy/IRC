@@ -51,7 +51,7 @@ class Client {
 		Client(int fd, struct sockaddr_in addr);
 		~Client(void);
 		//command handler for PASS, NICK, USER, QUIT
-		bool	            login(std::string command, std::map<std::string, int> nicknames);
+		bool	            login(std::string command, std::map<std::string, int> nicknames, std::map<std::string, Channel*> channels);
 		void				send_message(int client_fd, std::string message);
 		bool				is_valid_nick(std::string& nick);
 };
