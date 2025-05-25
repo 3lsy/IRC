@@ -408,6 +408,12 @@ void    Channel::change_mode(Client *client, std::string mode, std::string arg)
 		{
 			if (this->_operators.find(arg) != this->_operators.end())
 			{
+                //check if nickname isn't the same as the client
+                if (this->_operators[arg]->nickname == client->nickname)
+                {
+                    _print_error("Cannot remove yourself as operator", ":" + std::string(SERVERNAME) + " 482 " + this->_name + " :Cannot remove yourself as operator\r\n", client->fd);
+                    return;
+                }
 				this->_operators.erase(arg);
 				this->broadcast(":" + client->nickname + "!" + client->username + "@" + client->hostname + " MODE " + this->_name + " -o " + arg + "\r\n");
 				std::cout << BLUE << "SERVER: " << arg << " is no longer an operator of " << this->_name << RESET << std::endl;
