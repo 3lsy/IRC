@@ -66,6 +66,7 @@ private:
 	//send messages methods
 	void				_send_to_channel(int client_fd, Channel *channel, std::string message);
 	void				_send_to_client(int client_fd, int target_fd, std::string message);
+	void				_logout_client(int client_fd);
 
 	// Static pointer to hold the singleton instance
 	static IRC*			instance;

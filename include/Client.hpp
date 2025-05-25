@@ -56,4 +56,6 @@ class Client {
 		bool				is_valid_nick(std::string& nick);
 };
 
+extern Client               *null_client_ptr;
+
 #endif

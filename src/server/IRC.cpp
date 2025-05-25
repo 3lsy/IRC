@@ -13,6 +13,8 @@
 #include "IRC.hpp"
 
 IRC* IRC::instance = NULL;
+static Client null_client;
+Client* null_client_ptr = &null_client;
 
 bool	IRC::valid_port(int port) {
 	if (port < 1024 || port > 65535)
@@ -81,4 +83,22 @@ std::string IRC::getPassword(void) const {
 
 int IRC::getPort(void) const {
 	return this->_port;
+}
+
+void	IRC::_logout_client(int client_fd)
+{
+	// nullify client values using null_client_ptr in the member and operator maps in each channel, but leave the keys intact
+	for (std::map<std::string, Channel *>::iterator it = this->_channels.begin(); it != this->_channels.end(); ++it) {
+		Channel* channel = it->second;
+		if (channel) {
+			std::map<std::string, Client*>& members = channel->get_members();
+			std::map<std::string, Client*>& operators = channel->get_operators();
+			if (members.find(this->_clients[client_fd]->nickname) != members.end()) {
+				members[this->_clients[client_fd]->nickname] = null_client_ptr;
+			}
+			if (operators.find(this->_clients[client_fd]->nickname) != operators.end()) {
+				operators[this->_clients[client_fd]->nickname] = null_client_ptr;
+			}
+		}
+	}
 }

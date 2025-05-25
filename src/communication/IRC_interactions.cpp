@@ -385,17 +385,32 @@ bool IRC::_find_user_by_nickname(std::string nickname)
  * 
  * @note Client format message: :<nickname>!<username>@<hostname> PRIVMSG <channel> :<message>
  */
-void	IRC::_send_to_channel(int client_fd, Channel *channel, std::string message) {
-	std::map<std::string, Client *> members = channel->get_members();
-	std::map<std::string, Client *>::iterator it;
-	(void)client_fd;
-	for (it = members.begin(); it != members.end(); it++)
-	{
-		if (FD_ISSET(it->second->fd, &this->_write_set) && it->second->fd != client_fd)
-		{
-			_print_message("Sending message to " + it->second->nickname, ":" + this->_clients[client_fd]->nickname + '!' + this->_clients[client_fd]->username + '@' + this->_clients[client_fd]->hostname + " PRIVMSG " + channel->get_name() + " " + message + "\r\n", it->second->fd);
-		}
-	}
+void IRC::_send_to_channel(int client_fd, Channel *channel, std::string message) {
+    std::map<std::string, Client *> members = channel->get_members();
+    for (std::map<std::string, Client*>::const_iterator it = members.begin(); it != members.end(); ++it) {
+        Client* client = it->second;
+
+        if (client == null_client_ptr)
+            continue;
+
+        std::map<int, Client*>::iterator client_it = this->_clients.find(client->fd);
+        if (client_it == this->_clients.end())
+            continue;
+
+        Client* valid_client = client_it->second;
+
+        if (valid_client == NULL || valid_client == null_client_ptr || valid_client->fd == client_fd)
+            continue;
+
+        if (FD_ISSET(valid_client->fd, &this->_write_set)) {
+            std::string full_msg = ":" + this->_clients[client_fd]->nickname + "!" +
+                                   this->_clients[client_fd]->username + "@" +
+                                   this->_clients[client_fd]->hostname + " PRIVMSG " +
+                                   channel->get_name() + " " + message + "\r\n";
+
+            _print_message("Sending message to " + valid_client->nickname, full_msg, valid_client->fd);
+        }
+    }
 }
 
 /**

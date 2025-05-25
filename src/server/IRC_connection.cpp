@@ -76,6 +76,7 @@ void	IRC::_read_from_client(int fd)
 			std::cout << BLUE << "SERVER: Client disconnected" << RESET << std::endl;
 		else
 			std::cerr << RED << "SERVER: Error: Unable to read from client" << RESET << std::endl;
+        this->_logout_client(fd);
 		this->remove_client(fd);
         return;
 	}
