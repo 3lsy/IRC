@@ -36,7 +36,7 @@ private:
 	fd_set				_write_set;
 	fd_set				_master_set;
 	// buffer
-	char				_buffer[1024];
+	char				_buffer[1024 + 1];
 	int					_bytes_read;
 	bool				_running;
 	// Methods

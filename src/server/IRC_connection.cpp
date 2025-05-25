@@ -69,7 +69,8 @@ void    IRC::_read_client_message(int fd)
  */
 void	IRC::_read_from_client(int fd)
 {
-	this->_bytes_read = recv(fd, this->_buffer, sizeof(this->_buffer), 0);
+    char temp_buffer[1024 + 1];
+	this->_bytes_read = recv(fd, temp_buffer, sizeof(temp_buffer), 0);
 	if (this->_bytes_read <= 0)
 	{
 		if (this->_bytes_read == 0)
@@ -77,23 +78,36 @@ void	IRC::_read_from_client(int fd)
 		else
 			std::cerr << RED << "SERVER: Error: Unable to read from client" << RESET << std::endl;
 		this->remove_client(fd);
+        return;
 	}
-	else
-	{
-		this->_buffer[this->_bytes_read] = '\0';
-        std::cout << GREEN << "CLIENT{";
-        if (!this->_clients[fd]->nickname.empty())
-            std::cout << this->_clients[fd]->nickname;
-        else
-            std::cout << fd;
-        std::cout << "}: " << this->_buffer << RESET;
-        std::vector<std::string> lines = split_by(this->_buffer, '\n');
-        for (size_t i = 0; i < lines.size(); i++)
+    temp_buffer[this->_bytes_read] = '\0';
+    Client *client = this->_clients[fd];
+    if (client->input_buffer.empty())
+        client->input_buffer = temp_buffer;
+    else
+        client->input_buffer += temp_buffer;
+
+    size_t pos;
+    while ((pos = client->input_buffer.find('\n')) != std::string::npos)
+    {
+        std::string line = client->input_buffer.substr(0, pos);
+        client->input_buffer.erase(0, pos + 1); // Remove `\n`
+        if (!line.empty())
         {
-            strcpy(this->_buffer, lines[i].c_str());
+            if (line[line.size() - 1] == '\r') // Remove `\r` if present
+                line.erase(line.size() - 1);
+            strcpy(this->_buffer, line.c_str());
+            
+            std::cout << GREEN << "CLIENT{";
+            if (!this->_clients[fd]->nickname.empty())
+                std::cout << this->_clients[fd]->nickname;
+            else
+                std::cout << fd;
+            std::cout << "}: " << this->_buffer << RESET << std::endl;
+
             this->_read_client_message(fd);
         }
-	}
+    }
 }
 
 /**

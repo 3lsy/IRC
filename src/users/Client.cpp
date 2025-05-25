@@ -15,7 +15,7 @@
 Client::Client(void) {
 }
 
-Client::Client(int fd, struct sockaddr_in addr) : _password(false), _servername(""), _mode(""), _ip(""), fd(fd), nickname(""),
+Client::Client(int fd, struct sockaddr_in addr) : _password(false), _servername(""), _mode(""), _ip(""), fd(fd), input_buffer(""), nickname(""),
                                 username(""), realname(""), hostname(""), logged_in(false), socket_addr(addr)
 {
 	this->socket_len = sizeof(this->socket_addr);

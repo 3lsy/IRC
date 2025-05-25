@@ -38,6 +38,7 @@ class Client {
 	public:
 		// Attributes
 		int					fd;
+		std::string			input_buffer;
 		std::string			nickname;
 		std::string			username;
 		std::string			realname;
