@@ -1,4 +1,0 @@
-PASS password
-CAP LS 302
-NICK netcat
-USER netcat 0 * :netcat

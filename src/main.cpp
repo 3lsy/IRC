@@ -1,25 +1,4 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: echavez- <echavez-@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/27 11:57:58 by echavez-          #+#    #+#             */
-/*   Updated: 2024/08/11 18:19:13 by echavez-         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "IRC.hpp"
-/*
-int main() {
-    int port = 6667;  // Default IRC port
-    std::string password = "password";
-    IRC server(port, password);
-    server.serve();
-    return 0;
-}
-*/
 
 int main(int ac, char **av)
 {
