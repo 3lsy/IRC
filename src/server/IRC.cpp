@@ -26,6 +26,8 @@ IRC::IRC(int port, std::string password):
 
 	this->_create_socket();
 	this->_bind_socket();
+	if (this->_running == false)
+		return;
     opt = 1;
 	if (setsockopt(this->_socket_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
 	{

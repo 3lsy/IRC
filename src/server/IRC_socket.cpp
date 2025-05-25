@@ -30,8 +30,7 @@ void	IRC::_create_socket(void)
 void	IRC::_bind_socket(void)
 {
     int optval = 1;
-	if (setsockopt(this->_socket_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0 ||
-        setsockopt(this->_socket_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval)) < 0) {
+	if (setsockopt(this->_socket_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0) {
         std::cerr << RED << "SERVER: Error: Unable to set socket options" << RESET << std::endl;
         close(this->_socket_fd);
         exit(1);
@@ -44,6 +43,7 @@ void	IRC::_bind_socket(void)
 	if (bind(this->_socket_fd, (struct sockaddr *)&this->_serv_addr, sizeof(this->_serv_addr)) < 0)
 	{
 		std::cerr << RED << "SERVER: Error: Unable to bind socket" << RESET << std::endl;
-		exit(1);
+		close(this->_socket_fd);
+		this->_running = false;
 	}
 }

@@ -49,16 +49,19 @@ void	IRC::_event_search(void)
  * @brief Main loop for the server
  */
 void IRC::serve(void) {
-    std::cout << BLUE << "SERVER: IRC server started on port " << _port << RESET << std::endl;
-	FD_ZERO(&this->_master_set);
-	FD_SET(this->_socket_fd, &this->_master_set);
-	this->_max_fd = this->_socket_fd;
+	if (this->_running == true)
+	{
+    	std::cout << BLUE << "SERVER: IRC server started on port " << _port << RESET << std::endl;
+		FD_ZERO(&this->_master_set);
+		FD_SET(this->_socket_fd, &this->_master_set);
+		this->_max_fd = this->_socket_fd;
 
-	while (this->_running) {
-		this->_init_fd_sets();
-		if (!this->_running)
-			break;
-		this->_event_search();
+		while (this->_running) {
+			this->_init_fd_sets();
+			if (!this->_running)
+				break;
+			this->_event_search();
+		}
 	}
     if (instance) {
 		delete instance;
