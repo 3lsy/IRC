@@ -140,6 +140,7 @@ bool	Client::_cmd_pass(std::string password)
 	{
 		std::cerr << RED << "SERVER: Password incorrect" << RESET << std::endl;
 		std::string errorMessage = ":" + std::string(SERVERNAME) + " 464 * :Password incorrect\r\n";
+        std::cout << YELLOW << "SERVER{" << this->fd << "}: " << errorMessage << RESET;
         if (send(this->fd, errorMessage.c_str(), errorMessage.length(), 0) < 0) {
             std::cerr << RED << "SERVER: Error sending password error message to client" << RESET << std::endl;
         }
