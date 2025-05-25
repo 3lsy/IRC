@@ -63,19 +63,28 @@ bool Client::login(std::string command, std::map<std::string, int> nicknames, st
 	if (cmd[0] == "PASS")
 	{
 		if (cmd.size() < 2)
+        {
+            std::cout << BLUE << "SERVER: Invalid number of PASS parameters" << RESET << std::endl;
 			return (false);
+        }
 		success = this->_cmd_pass(cmd[1]);
 	}
 	else if (cmd[0] == "NICK")
 	{
 		if (cmd.size() < 2)
+        {
+            std::cout << BLUE << "SERVER: Invalid number of NICK parameters" << RESET << std::endl;
 			return (false);
+        }
 		this->_cmd_nick(cmd[1], nicknames);
 	}
 	else if (cmd[0] == "USER")
 	{
 		if (cmd.size() < 5)
+        {
+            std::cout << BLUE << "SERVER: Invalid number of USER parameters" << RESET << std::endl;
 			return (false);
+        }
 		this->_cmd_user(cmd[1], cmd[2], cmd[3], cmd[4]);
 	}
     else if (cmd[0] == "QUIT")
