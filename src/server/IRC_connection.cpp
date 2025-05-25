@@ -53,7 +53,6 @@ void    IRC::_read_client_message(int fd)
     {
         if (this->_clients[fd]->login(this->_buffer, this->_nicknames) == false)
         {
-            this->remove_client(fd);
             return ;
         }
         if (this->_clients[fd]->logged_in)
@@ -106,6 +105,10 @@ void	IRC::_read_from_client(int fd)
             std::cout << "}: " << this->_buffer << RESET << std::endl;
 
             this->_read_client_message(fd);
+            // protect if client might have been deleted
+            if (this->_clients.find(fd) == this->_clients.end())
+                return;
+            client = this->_clients[fd]; // Re-fetching pointer
         }
     }
 }
